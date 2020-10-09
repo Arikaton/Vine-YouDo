@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -216,26 +217,15 @@ public class Back4appHelper : MonoBehaviour
     IEnumerator UploadImageToServerCor(Texture2D image, string color, string grape, string country, string region, OnEndAddDataCallback onEndAddDataCallback)
     {
         List<IMultipartFormSection> data = new List<IMultipartFormSection>();
-        /*yield return new WaitForEndOfFrame();
-        int width = Screen.width;
-        int height = Screen.height;
-        Texture2D tex = new Texture2D(width, height, TextureFormat.RGB24, false);
-        tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-        tex.Apply();*/
-        data.Add(new MultipartFormFileSection(image.EncodeToJPG()));
+        var imageByteData = File.ReadAllBytes(Application.dataPath + "/Sprites/Backgrounds/мОрдынка.jpg");
+        data.Add(new MultipartFormFileSection(imageByteData));
 
-        WWWForm form = new WWWForm();
-        //form.AddField("", "UnityImage.png",);
-        form.AddBinaryData("File", image.EncodeToJPG(), "UnityImage.jpg", "image/jpeg");
-        
-        //System.IO.File.WriteAllBytes(Application.persistentDataPath + "/testImage.png", image.EncodeToPNG());
-        //print(Application.persistentDataPath);
-
-
-        var www = UnityWebRequest.Post("https://parseapi.back4app.com/files/UnityImage.jpg", form);
+        var www = new UnityWebRequest("https://parseapi.back4app.com/files/UnityImage.jpg");
         www.SetRequestHeader("X-Parse-Application-Id", parseApplicationId);
         www.SetRequestHeader("X-Parse-REST-API-Key", restApiKey);
-        //www.SetRequestHeader("Content-Type", "image/jpg");
+        www.SetRequestHeader("Content-Type", "image/jpg");
+        www.method = "POST";
+        www.uploadHandler = new UploadHandlerFile(Application.dataPath + "/Sprites/Backgrounds/мОрдынка.jpg");
         
         www.downloadHandler = new DownloadHandlerBuffer();
 
@@ -360,9 +350,11 @@ public class UploadImageData
     }
 }
 
-/*public class DataPiece
+class VineData
 {
-    public string ObjectId { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdateAt { get; private set; }
-}*/
+    public String objectId;
+    public string Color;
+    public string Grape;
+    public string Region;
+    public string Country;
+}
