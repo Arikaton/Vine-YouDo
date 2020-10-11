@@ -54,9 +54,9 @@ public class Back4appHelper : MonoBehaviour
         StartCoroutine(GetCountriesCor(onEndGetDataCallback));
     }
 
-    public void AddRegion(string region, OnEndAddDataCallback onEndAddDataCallback)
+    public void AddRegion(string region, string country, OnEndAddDataCallback onEndAddDataCallback)
     {
-        StartCoroutine(AddRegionCor(region, onEndAddDataCallback));
+        StartCoroutine(AddRegionCor(region, country, onEndAddDataCallback));
     }
 
     public void GetRegions(OnEndGetDataCallback onEndGetDataCallback)
@@ -128,9 +128,9 @@ public class Back4appHelper : MonoBehaviour
         onEndGetDataCallback(new GetDataCallback(www.downloadHandler.text, www.responseCode));
     }
 
-    IEnumerator AddRegionCor(string region, OnEndAddDataCallback onEndAddDataCallback)
+    IEnumerator AddRegionCor(string region, string country, OnEndAddDataCallback onEndAddDataCallback)
     {
-        var data = CreateDataFromString("Region", region);
+        var data = CreateDataFromDict(new Dictionary<string, string>() {{"Region", region}, {"Country", country}});
         var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + REGIONS);
         www.method = "POST";
         www.uploadHandler = new UploadHandlerRaw(UTF8Encoding.UTF8.GetBytes(data));
