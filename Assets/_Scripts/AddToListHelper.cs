@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AddToListHelper : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class AddToListHelper : MonoBehaviour
     [SerializeField] private GameObject downloadImage;
     [SerializeField] private GameObject successText;
     [SerializeField] private GameObject errorText;
+    [SerializeField] private Image color;
 
     private bool isLoading = false;
 

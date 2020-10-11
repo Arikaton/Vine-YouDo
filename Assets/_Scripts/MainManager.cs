@@ -8,8 +8,8 @@ public class MainManager : MonoBehaviour
     [SerializeField] private Back4appHelper _back4AppHelper;
     [SerializeField] private UIManager _uiManager;
 
-    private void Start()
+    public void TakePhoto()
     {
-        _uiManager.ShowWindow("Root Canvas");
     }
+
 }

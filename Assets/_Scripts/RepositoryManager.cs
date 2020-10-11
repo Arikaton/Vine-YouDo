@@ -43,6 +43,11 @@ public class RepositoryManager : MonoBehaviour
         return false;
     }
 
+    public void GetAllVines()
+    {
+        _back4AppHelper.GetVine(GetVineDataCallback);
+    }
+
     public void GetColors()
     {
         _back4AppHelper.GetColors(DebugGetDataCallback);
@@ -51,6 +56,11 @@ public class RepositoryManager : MonoBehaviour
     public void UploadImage(Texture2D image)
     {
         _back4AppHelper.AddVine(image, DebugAddDataCallback);
+    }
+
+    public void GetVineDataCallback(GetDataCallback getDataCallback)
+    {
+        getDataCallback.PrintResults();
     }
 
     public void AddToListRepository(AddDataCallback callback)

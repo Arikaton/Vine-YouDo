@@ -5,32 +5,12 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
-    private WindowManager[] windows;
-
-    private void Start()
+    [SerializeField] private GameObject prevWindow;
+    
+    public void ShowWindow(GameObject window)
     {
-        windows = FindObjectsOfType<WindowManager>();
-    }
-
-    public void ShowWindow(string name)
-    {
-        bool haveOne = false;
-        foreach (var window in windows)
-        {
-            if (window.WindowName == name)
-            {
-                haveOne = true;
-                window.gameObject.SetActive(true);
-            }
-            else
-            {
-                window.gameObject.SetActive(false);
-            }
-        }
-
-        if (!haveOne)
-        {
-            print($"Can't find window with name {name}.");
-        }
+        window.SetActive(true);
+        prevWindow.SetActive(false);
+        prevWindow = window;
     }
 }

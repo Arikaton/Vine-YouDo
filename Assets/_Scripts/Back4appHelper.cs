@@ -23,16 +23,6 @@ public class Back4appHelper : MonoBehaviour
 
     [SerializeField] private string parseApplicationId;
     [SerializeField] private string restApiKey;
-    [SerializeField] private UnityEngine.UI.Image testImage;
-
-    //private string testImageUrl =
-    //    "https://parsefiles.back4app.com/3wnDQP64MYfQ9VRJub2SFyepUpPxw0bkK1YKIzeI/2f50e0f41d28ab65d2cee56677432013_TestPicture.jpg";
-    //private string testImageName = "2f50e0f41d28ab65d2cee56677432013_TestPicture.jpg";
-
-    private void Start()
-    {
-        //StartCoroutine(DownloadImageFromServerCor());
-    }
 
     public void AddColor(string color, OnEndAddDataCallback onEndAddDataCallback)
     {
@@ -72,6 +62,11 @@ public class Back4appHelper : MonoBehaviour
     public void GetGrapes(OnEndGetDataCallback onEndGetDataCallback)
     {
         StartCoroutine(GetGrapesCor(onEndGetDataCallback));
+    }
+
+    public void GetVine(OnEndGetDataCallback onEndGetDataCallback)
+    {
+        StartCoroutine(GetVineCor(onEndGetDataCallback));
     }
 
     public void AddVine(Texture2D image, OnEndAddDataCallback onEndAddDataCallback, string color = "",  string grape = "", string country = "", string region = "")
@@ -173,6 +168,16 @@ public class Back4appHelper : MonoBehaviour
         
         onEndGetDataCallback(new GetDataCallback(www.downloadHandler.text, www.responseCode));
     }
+
+    IEnumerator GetVineCor(OnEndGetDataCallback onEndGetDataCallback)
+    {
+        var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + VINE);
+        www.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return www.SendWebRequest();
+        
+        onEndGetDataCallback(new GetDataCallback(www.downloadHandler.text, www.responseCode));
+    }
     
     IEnumerator AddVineCor(string imageUrl, string imageName, string color,  string grape, string country, string region, OnEndAddDataCallback onEndAddDataCallback)
     {
@@ -209,7 +214,6 @@ public class Back4appHelper : MonoBehaviour
         yield return www.SendWebRequest();
 
         Texture2D tex = DownloadHandlerTexture.GetContent(www);
-        testImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
         System.IO.File.WriteAllBytes( Application.dataPath + "/UnityImage.jpg", tex.EncodeToJPG());
         print(Application.dataPath);
     }
@@ -357,4 +361,5 @@ class VineData
     public string Grape;
     public string Region;
     public string Country;
+    public string Description;
 }
