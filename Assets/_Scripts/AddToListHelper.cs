@@ -11,7 +11,7 @@ public class AddToListHelper : MonoBehaviour
     [SerializeField] private GameObject downloadImage;
     [SerializeField] private GameObject successText;
     [SerializeField] private GameObject errorText;
-    [SerializeField] private Image color;
+    public Image color;
 
     private bool isLoading = false;
 

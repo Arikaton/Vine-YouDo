@@ -5,11 +5,4 @@ using UnityEngine;
 
 public class WindowManager : MonoBehaviour
 {
-    public string WindowName
-    {
-        get
-        {
-            return gameObject.name;
-        }
-    }
 }

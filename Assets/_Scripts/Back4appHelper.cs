@@ -24,9 +24,9 @@ public class Back4appHelper : MonoBehaviour
     [SerializeField] private string parseApplicationId;
     [SerializeField] private string restApiKey;
 
-    public void AddColor(string color, OnEndAddDataCallback onEndAddDataCallback)
+    public void AddColor(string color, string hex, OnEndAddDataCallback onEndAddDataCallback)
     {
-        StartCoroutine(AddColorCor(color, onEndAddDataCallback));
+        StartCoroutine(AddColorCor(color, hex, onEndAddDataCallback));
     }
 
     public void GetColors(OnEndGetDataCallback onEndGetDataCallback)
@@ -54,9 +54,9 @@ public class Back4appHelper : MonoBehaviour
         StartCoroutine(GetRegionsCor(onEndGetDataCallback));
     }
 
-    public void AddGrape(string grape, OnEndAddDataCallback onEndAddDataCallback)
+    public void AddGrape(string grape, string hex, OnEndAddDataCallback onEndAddDataCallback)
     {
-        StartCoroutine(AddGrapeCor(grape, onEndAddDataCallback));
+        StartCoroutine(AddGrapeCor(grape, hex, onEndAddDataCallback));
     }
 
     public void GetGrapes(OnEndGetDataCallback onEndGetDataCallback)
@@ -74,9 +74,9 @@ public class Back4appHelper : MonoBehaviour
         StartCoroutine(UploadImageToServerCor(image, color, grape, country, region, onEndAddDataCallback));
     }
 
-    IEnumerator AddColorCor(string color, OnEndAddDataCallback onEndAddDataCallback)
+    IEnumerator AddColorCor(string color, string hex, OnEndAddDataCallback onEndAddDataCallback)
     {
-        var data = CreateDataFromString("Color", color);
+        var data = CreateDataFromDict(new Dictionary<string, string>() {{"Color", color}, {"HEX", hex}});
         var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + COLORS);
         www.method = "POST";
         www.uploadHandler = new UploadHandlerRaw(UTF8Encoding.UTF8.GetBytes(data));
@@ -146,9 +146,9 @@ public class Back4appHelper : MonoBehaviour
         onEndGetDataCallback(new GetDataCallback(www.downloadHandler.text, www.responseCode));
     }
     
-    IEnumerator AddGrapeCor(string grape, OnEndAddDataCallback onEndAddDataCallback)
+    IEnumerator AddGrapeCor(string grape, string hex, OnEndAddDataCallback onEndAddDataCallback)
     {
-        var data = CreateDataFromString("Grape", grape);
+        var data = CreateDataFromDict(new Dictionary<string, string>(){{"Grape", grape},{"HEX", hex}});
         var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + GRAPES);
         www.method = "POST";
         www.uploadHandler = new UploadHandlerRaw(UTF8Encoding.UTF8.GetBytes(data));

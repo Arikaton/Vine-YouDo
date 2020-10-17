@@ -12,14 +12,16 @@ public class RepositoryManager : MonoBehaviour
     public void AddGrape(Text text)
     {
         if (PreparingAddData(text)) return;
-        _back4AppHelper.AddGrape(text.text, AddToListRepository);
+        string hexColor = ColorUtility.ToHtmlStringRGB(AddToListHelper.current.color.color);
+        _back4AppHelper.AddGrape(text.text,  hexColor, AddToListRepository);
 
     }
     
     public void AddColor(Text text)
     {
         if (PreparingAddData(text)) return;
-        _back4AppHelper.AddColor(text.text, AddToListRepository);
+        string hexColor = ColorUtility.ToHtmlStringRGB(AddToListHelper.current.color.color);
+        _back4AppHelper.AddColor(text.text, hexColor, AddToListRepository);
     }
 
     public void AddRegion(Text regionText, Text countryText)

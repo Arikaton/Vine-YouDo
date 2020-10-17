@@ -5,7 +5,7 @@ using UnityEngine;
 public class GetVineManager : MonoBehaviour
 {
     [SerializeField] private RepositoryManager repository;
-    [SerializeField] 
+    //[SerializeField] 
 
     public void GetAllVine()
     {
