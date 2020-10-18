@@ -281,33 +281,7 @@ public class Back4appHelper : MonoBehaviour
 
     private string CreateDataFromDict(Dictionary<string, string> query)
     {
-        string result = "{";
-        bool isFirst = true;
-        foreach (var key in  query.Keys)
-        {
-            if (isFirst)
-            {
-                isFirst = false;
-                if (query[key].StartsWith("{"))
-                    result += string.Format("\"{0}\":{1}", key, query[key]);
-                else 
-                    result += string.Format("\"{0}\":\"{1}\"", key, query[key]);
-            }
-            else
-            {
-                if (query[key].StartsWith("{"))
-                    result += string.Format(",\"{0}\":{1}", key, query[key]);
-                else
-                    result += string.Format(",\"{0}\":\"{1}\"", key, query[key]);
-            }
-        }
-        result += "}";
-        return result;
-    }
-
-    private string CreateDataFromString(string key, string value)
-    {
-        return string.Format("{{\"{0}\":\"{1}\"}}", key, value);
+        return JsonConvert.SerializeObject(query);
     }
 
     private UnityWebRequest CreateRequestAndSetHeaders(string url)
