@@ -31,7 +31,7 @@ PrefabInstance:
     - target: {fileID: 8448542097463965810, guid: eba837e273b0b49f4b941527dc240aed,
         type: 3}
       propertyPath: m_Name
-      value: Settings Canvas
+      value: Canvas With Brow
       objectReference: {fileID: 0}
     - target: {fileID: 8448542097463965813, guid: eba837e273b0b49f4b941527dc240aed,
         type: 3}

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using _Scripts;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
@@ -19,7 +20,7 @@ public class Back4appHelper : MonoBehaviour
     public static string GRAPES = "Grapes";
     public static string VINE = "Vine";
     public delegate void OnEndAddDataCallback(AddDataCallback data);
-    public delegate void OnEndGetDataCallback(GetDataCallback data);
+    public delegate void OnEndGetDataCallback(CommonData data);
 
     [SerializeField] private string parseApplicationId;
     [SerializeField] private string restApiKey;
@@ -34,9 +35,9 @@ public class Back4appHelper : MonoBehaviour
         StartCoroutine(GetColorsCor(onEndGetDataCallback));
     }
 
-    public void AddCountry(string country, OnEndAddDataCallback onEndAddDataCallback)
+    public void AddCountry(string country, string hexColor, OnEndAddDataCallback onEndAddDataCallback)
     {
-        StartCoroutine(AddCountryCor(country, onEndAddDataCallback));
+        StartCoroutine(AddCountryCor(country, hexColor, onEndAddDataCallback));
     }
 
     public void GetCountries(OnEndGetDataCallback onEndGetDataCallback)
@@ -62,6 +63,39 @@ public class Back4appHelper : MonoBehaviour
     public void GetGrapes(OnEndGetDataCallback onEndGetDataCallback)
     {
         StartCoroutine(GetGrapesCor(onEndGetDataCallback));
+    }
+
+    public void DeleteObject(string objectId, string objectType)
+    {
+        StartCoroutine(DeleteObjectCor(objectId, objectType));
+    }
+    
+    private IEnumerator DeleteObjectCor(string objectId, string objectType)
+    {
+        var www = UnityWebRequest.Delete($"https://parseapi.back4app.com/classes/{objectType}/{objectId}");
+        www.SetRequestHeader("X-Parse-Application-Id", parseApplicationId);
+        www.SetRequestHeader("X-Parse-REST-API-Key", restApiKey);
+        www.SetRequestHeader("Content-Type", "application/json");
+        www.downloadHandler = new DownloadHandlerBuffer();
+        yield return www.SendWebRequest();
+    }
+
+    public void UpdateFavorite(bool isFavorite, string objectId, string type)
+    {
+        StartCoroutine(UpdateFavoriteCor(isFavorite, objectId, type));
+    }
+
+    private IEnumerator UpdateFavoriteCor(bool isFavorite, string objectId, string type)
+    {
+        var data = JsonConvert.SerializeObject(new Dictionary<string, bool>() {{"IsFavorite", isFavorite}});
+        var www = UnityWebRequest.Put($"https://parseapi.back4app.com/classes/{type}/{objectId}", UTF8Encoding.UTF8.GetBytes(data));
+        www.SetRequestHeader("X-Parse-Application-Id", parseApplicationId);
+        www.SetRequestHeader("X-Parse-REST-API-Key", restApiKey);
+        www.SetRequestHeader("Content-Type", "application/json");
+        www.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return www.SendWebRequest();
+        Debug.Log(www.downloadHandler.text);
     }
 
     public void GetVine(OnEndGetDataCallback onEndGetDataCallback)
@@ -96,13 +130,13 @@ public class Back4appHelper : MonoBehaviour
         
         print(www.downloadHandler.text);
         
-        onEndGetDataCallback(new GetDataCallback(www.downloadHandler.text, www.responseCode));
+        onEndGetDataCallback(new CommonData(www.downloadHandler.text, www.responseCode));
 
     }
     
-    IEnumerator AddCountryCor(string country, OnEndAddDataCallback onEndAddDataCallback)
+    IEnumerator AddCountryCor(string country, string hexColor, OnEndAddDataCallback onEndAddDataCallback)
     {
-        var data = CreateDataFromString("Country", country);
+        var data = CreateDataFromDict(new Dictionary<string, string>() {{"Country", country}, {"HEX", hexColor}});
         var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + COUNTRIES);
         www.method = "POST";
         www.uploadHandler = new UploadHandlerRaw(UTF8Encoding.UTF8.GetBytes(data));
@@ -120,7 +154,7 @@ public class Back4appHelper : MonoBehaviour
 
         yield return www.SendWebRequest();
         
-        onEndGetDataCallback(new GetDataCallback(www.downloadHandler.text, www.responseCode));
+        onEndGetDataCallback(new CommonData(www.downloadHandler.text, www.responseCode));
     }
 
     IEnumerator AddRegionCor(string region, string country, OnEndAddDataCallback onEndAddDataCallback)
@@ -143,7 +177,7 @@ public class Back4appHelper : MonoBehaviour
 
         yield return www.SendWebRequest();
         
-        onEndGetDataCallback(new GetDataCallback(www.downloadHandler.text, www.responseCode));
+        onEndGetDataCallback(new CommonData(www.downloadHandler.text, www.responseCode));
     }
     
     IEnumerator AddGrapeCor(string grape, string hex, OnEndAddDataCallback onEndAddDataCallback)
@@ -166,7 +200,7 @@ public class Back4appHelper : MonoBehaviour
 
         yield return www.SendWebRequest();
         
-        onEndGetDataCallback(new GetDataCallback(www.downloadHandler.text, www.responseCode));
+        onEndGetDataCallback(new CommonData(www.downloadHandler.text, www.responseCode));
     }
 
     IEnumerator GetVineCor(OnEndGetDataCallback onEndGetDataCallback)
@@ -176,7 +210,7 @@ public class Back4appHelper : MonoBehaviour
 
         yield return www.SendWebRequest();
         
-        onEndGetDataCallback(new GetDataCallback(www.downloadHandler.text, www.responseCode));
+        onEndGetDataCallback(new CommonData(www.downloadHandler.text, www.responseCode));
     }
     
     IEnumerator AddVineCor(string imageUrl, string imageName, string color,  string grape, string country, string region, OnEndAddDataCallback onEndAddDataCallback)
@@ -317,13 +351,13 @@ public class AddDataCallback
     }
 }
 
-public class GetDataCallback
+public class CommonData
 {
     public long ResponseCode { get; private set; }
     public string Json { get; private set; }
     public List<JToken> Results { get; private set; }
 
-    public GetDataCallback(string json, long responseCode)
+    public CommonData(string json, long responseCode)
     {
         ResponseCode = responseCode;
         Json = json;
@@ -336,6 +370,22 @@ public class GetDataCallback
         {
             Debug.Log(result.ToString());
         }
+    }
+}
+
+public class CommonResult
+{
+    public string name;
+    public string hexColor;
+    public bool isFavorite;
+    public string objectId;
+
+    public CommonResult(string name, string hexColor, bool isFavorite, string objectId)
+    {
+        this.name = name;
+        this.hexColor = hexColor;
+        this.isFavorite = isFavorite;
+        this.objectId = objectId;
     }
 }
 

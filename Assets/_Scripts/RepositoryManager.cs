@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using _Scripts;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,14 +8,40 @@ public class RepositoryManager : MonoBehaviour
 {
     [SerializeField] private Back4appHelper _back4AppHelper;
 
-    private bool isDownloading = false;
+    private bool _grapeNeedUpdate = true;
+    private bool _colorNeedUpdate = true;
+    private bool _countryNeedUpdate = true;
 
     public void AddGrape(Text text)
     {
         if (PreparingAddData(text)) return;
         string hexColor = ColorUtility.ToHtmlStringRGB(AddToListHelper.current.color.color);
         _back4AppHelper.AddGrape(text.text,  hexColor, AddToListRepository);
+        _grapeNeedUpdate = true;
+    }
 
+    public void GetGrape()
+    {
+        if (_grapeNeedUpdate)
+            _back4AppHelper.GetGrapes(OnGetGrape);
+    }
+
+    public void OnGetGrape(CommonData grapeData)
+    {
+        List<CommonResult> commonResults = grapeData.Results.ConvertAll<CommonResult>(result =>
+            {
+                bool isFavorite = (bool?) result["IsFavorite"] == true;
+                return new CommonResult(
+                    result["Grape"].ToString(),
+                    result["HEX"].ToString(),
+                    isFavorite,
+                    result["objectId"].ToString()
+                );
+            }
+            
+        );
+        GetFromListHelper.Current.GenerateList(commonResults);
+        _grapeNeedUpdate = false;
     }
     
     public void AddColor(Text text)
@@ -22,6 +49,32 @@ public class RepositoryManager : MonoBehaviour
         if (PreparingAddData(text)) return;
         string hexColor = ColorUtility.ToHtmlStringRGB(AddToListHelper.current.color.color);
         _back4AppHelper.AddColor(text.text, hexColor, AddToListRepository);
+        _colorNeedUpdate = true;
+    }
+    
+    public void GetColor()
+    {
+        if (_colorNeedUpdate)
+        {
+            _back4AppHelper.GetColors(OnGetColor);
+        }
+    }
+
+    public void OnGetColor(CommonData commonData)
+    {
+        List<CommonResult> commonResults = commonData.Results.ConvertAll<CommonResult>(result =>
+            {
+                bool isFavorite = (bool?) result["IsFavorite"] == true;
+                return new CommonResult(
+                    result["Color"].ToString(),
+                    result["HEX"].ToString(),
+                    isFavorite,
+                    result["objectId"].ToString()
+                );
+            }
+        );
+        GetFromListHelper.Current.GenerateList(commonResults);
+        _colorNeedUpdate = false;
     }
 
     public void AddRegion(Text regionText, Text countryText)
@@ -33,15 +86,38 @@ public class RepositoryManager : MonoBehaviour
     public void AddCountry(Text text)
     {
         if (PreparingAddData(text)) return;
-        _back4AppHelper.AddCountry(text.text, AddToListRepository);
+        string hexColor = ColorUtility.ToHtmlStringRGB(AddToListHelper.current.color.color);
+        _back4AppHelper.AddCountry(text.text, hexColor, AddToListRepository);
+        _countryNeedUpdate = true;
+    }
+
+    public void GetCountries()
+    {
+        if (_countryNeedUpdate)
+            _back4AppHelper.GetCountries(OnGetCountries);
+    }
+    
+    public void OnGetCountries(CommonData commonData)
+    {
+        List<CommonResult> commonResults = commonData.Results.ConvertAll<CommonResult>(result =>
+            {
+                bool isFavorite = (bool?) result["IsFavorite"] == true;
+                return new CommonResult(
+                    result["Country"].ToString(),
+                    result["HEX"].ToString(),
+                    isFavorite,
+                    result["objectId"].ToString()
+                );
+            }
+        );
+        GetFromListHelper.Current.GenerateList(commonResults);
+        _countryNeedUpdate = false;
     }
 
     private bool PreparingAddData(Text text)
     {
-        if (isDownloading) return true;
         if (string.IsNullOrEmpty(text.text)) return true;
         AddToListHelper.current.StartAddingData();
-        isDownloading = true;
         return false;
     }
 
@@ -60,14 +136,13 @@ public class RepositoryManager : MonoBehaviour
         _back4AppHelper.AddVine(image, DebugAddDataCallback);
     }
 
-    public void GetVineDataCallback(GetDataCallback getDataCallback)
+    public void GetVineDataCallback(CommonData commonData)
     {
-        getDataCallback.PrintResults();
+        commonData.PrintResults();
     }
 
     public void AddToListRepository(AddDataCallback callback)
     {
-        isDownloading = false;
         if (callback.ResponseCode == 201)
         {
             AddToListHelper.current.FinishedAddingData();
@@ -78,7 +153,7 @@ public class RepositoryManager : MonoBehaviour
         }
     }
     
-    void DebugGetDataCallback(GetDataCallback data)
+    void DebugGetDataCallback(CommonData data)
     {
         print(data.ResponseCode);
         data.PrintResults();
