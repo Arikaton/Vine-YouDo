@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,30 +11,172 @@ namespace _Scripts
     {
         public static GetFromListHelper Current;
 
-        private void OnEnable()
-        {
-            Current = this;
-        }
-
         [SerializeField] private Back4appHelper _back4AppHelper;
         [SerializeField] private Transform scrollViewContent;
         [SerializeField] private EditListButton buttonPrefab;
+        [SerializeField] private GameObject loadingAnimation;
+        [SerializeField] private GameObject errorMessage;
         [SerializeField] private string type;
+        
+        private void OnEnable()
+        {
+            GetData();
+            Current = this;
+            errorMessage.SetActive(false);
+        }
+
+        public void GetData()
+        {
+            loadingAnimation.SetActive(true);
+            bool needUpdate = false;
+            GetDataResult data = null;
+            if (type == Back4appHelper.GRAPES_CLASS)
+            {
+                if (RepositoryManager._grapeNeedUpdate)
+                {
+                    needUpdate = true;
+                    RepositoryManager._grapeNeedUpdate = false;
+                }
+                else
+                    data = new GetDataResult(RepositoryManager.grapeData);
+            }
+            else if (type == Back4appHelper.COLORS_CLASS)
+            {
+                if (RepositoryManager._colorNeedUpdate)
+                {
+                    needUpdate = true;
+                    RepositoryManager._colorNeedUpdate = false;
+                }
+                else
+                    data = new GetDataResult(RepositoryManager.colorData);
+            }
+            else if (type == Back4appHelper.COUNTRIES_CLASS)
+            {
+                if (RepositoryManager._countryNeedUpdate)
+                {
+                    needUpdate = true;
+                    RepositoryManager._countryNeedUpdate = false;
+                }
+                else
+                    data = new GetDataResult(RepositoryManager.countryData);
+            }
+            else if (type == Back4appHelper.REGIONS_CLASS)
+            {
+                if (RepositoryManager._regionNeedUpdate)
+                {
+                    needUpdate = true;
+                    RepositoryManager._regionNeedUpdate = false;
+                }
+                else
+                    data = new GetDataResult(RepositoryManager.regionData);
+            }
+            else
+            {
+                throw new Exception("Wrong type");
+            }
+
+            if (needUpdate)
+            {
+                _back4AppHelper.GetData(type, OnGetData);
+                Debug.Log("Data getting from b4a");
+            }
+            else
+            {
+                if (scrollViewContent.childCount != 0)
+                {
+                    Debug.Log("Data getting from local storage");
+                    OnGetData(data);
+                }
+            }
+        }
+
+        private void OnGetData(GetDataResult result)
+        {
+            if (result.ResponseCode != 200)
+            {
+                errorMessage.SetActive(true);
+            }
+            else
+            {
+                loadingAnimation.SetActive(false);
+                UpdateLocalData(result);
+                var deserializedObject = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(result.resultsString);
+                List<CommonResult> commonResults = new List<CommonResult>();
+                foreach (var data in deserializedObject)
+                {
+                    bool isFavorite = (bool?) data["IsFavorite"] == true;
+                    string objectId = data["objectId"].ToString();
+                    string hexColor = data[Back4appHelper.HEX].ToString();
+                    string name = "";
+                    if (type == Back4appHelper.GRAPES_CLASS)
+                    {
+                        name = data[Back4appHelper.GRAPES_FIELD].ToString();
+                    }
+                    else if (type == Back4appHelper.COLORS_CLASS)
+                    {
+                        name = data[Back4appHelper.COLOR_FIELD].ToString();
+                    }
+                    else if (type == Back4appHelper.COUNTRIES_CLASS)
+                    {
+                        name = data[Back4appHelper.COUNTRIES_FIELD].ToString();
+                    }
+                    else if (type == Back4appHelper.REGIONS_CLASS)
+                    {
+                        name = data[Back4appHelper.REGION_FIELD].ToString();
+                    }
+                    else
+                    {
+                        throw new Exception("Wrong type");
+                    }
+
+                    var newResult = new CommonResult(name, hexColor, isFavorite, objectId);
+                    commonResults.Add(newResult);
+                }
+                GenerateList(commonResults);
+            }
+        }
+
+        private void UpdateLocalData(GetDataResult result)
+        {
+            if (type == Back4appHelper.GRAPES_CLASS)
+            {
+                RepositoryManager.grapeData = result.resultsString;
+            }
+            else if (type == Back4appHelper.COLORS_CLASS)
+            {
+                RepositoryManager.colorData = result.resultsString;
+            }
+            else if (type == Back4appHelper.COUNTRIES_CLASS)
+            {
+                RepositoryManager.countryData = result.resultsString;
+            }
+            else if (type == Back4appHelper.REGIONS_CLASS)
+            {
+                RepositoryManager.regionData = result.resultsString;
+            }
+            else
+            {
+                throw new Exception("Wrong type");
+            }
+        }
 
         public void GenerateList(List<CommonResult> commonResults)
         {
             DeleteChildren();
-            
-            foreach (var result in commonResults)
+
+            var orderedEnumerable = commonResults
+                .OrderBy(x => x.isFavorite)
+                .ThenBy(x => x.name);
+
+            foreach (var result in orderedEnumerable)
             {
                 var newButton = Instantiate(buttonPrefab, scrollViewContent);
-                Color buttonColor;
-                if (ColorUtility.TryParseHtmlString("#" + result.hexColor, out buttonColor))
+                if (ColorUtility.TryParseHtmlString("#" + result.hexColor, out var buttonColor))
                 {
                     newButton.Init(buttonColor, result.name, result.isFavorite, result.objectId);
                 }
             }
-            FilterListByFavorite(); //I'm too lazy to rewrite it
+            //FilterListByFavorite();
         }
 
         public void DeleteChildren()

@@ -5,7 +5,7 @@ namespace _Scripts
 {
     public class EditListButton : MonoBehaviour
     {
-        public static EditListButton active;
+        private static EditListButton _active;
         
         [SerializeField] private Image image;
         [SerializeField] private Text nameText;
@@ -28,12 +28,12 @@ namespace _Scripts
 
         public void ShowMenu()
         {
-            if (active != null)
+            if (_active != null)
             {
-                if (active != this)
+                if (_active != this)
                 {
-                    active.HideMenu();
-                    active = this;
+                    _active.HideMenu();
+                    _active = this;
                     menu.SetActive(true);
                 }
                 else
@@ -43,7 +43,7 @@ namespace _Scripts
             }
             else
             {
-                active = this;
+                _active = this;
                 menu.SetActive(true); 
             }
         }
@@ -62,6 +62,7 @@ namespace _Scripts
 
         public void UpdateFavorite()
         {
+            HideMenu();
             IsFavorite = !IsFavorite;
             GetFromListHelper.Current.UpdateFavorite(IsFavorite, _objectId);
             UpdateFavoriteIcon();

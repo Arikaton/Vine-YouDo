@@ -6,29 +6,25 @@ using UnityEngine.UI;
 
 public class RepositoryManager : MonoBehaviour
 {
-    [SerializeField] private Back4appHelper _back4AppHelper;
+    public static bool _grapeNeedUpdate = true;
+    public static bool _colorNeedUpdate = true;
+    public static bool _countryNeedUpdate = true;
+    public static bool _regionNeedUpdate = true;
 
-    private bool _grapeNeedUpdate = true;
-    private bool _colorNeedUpdate = true;
-    private bool _countryNeedUpdate = true;
+    public static string grapeData;
+    public static string colorData;
+    public static string countryData;
+    public static string regionData;
 
-    public void AddGrape(Text text)
-    {
-        if (PreparingAddData(text)) return;
-        string hexColor = ColorUtility.ToHtmlStringRGB(AddToListHelper.current.color.color);
-        _back4AppHelper.AddGrape(text.text,  hexColor, AddToListRepository);
-        _grapeNeedUpdate = true;
-    }
-
-    public void GetGrape()
+    /*public void GetGrape()
     {
         if (_grapeNeedUpdate)
-            _back4AppHelper.GetGrapes(OnGetGrape);
+            _back4AppHelper.GetData(Back4appHelper.GRAPES_CLASS, OnGetGrape);
     }
 
-    public void OnGetGrape(CommonData grapeData)
+    private void OnGetGrape(GetDataResult grapeDataResult)
     {
-        List<CommonResult> commonResults = grapeData.Results.ConvertAll<CommonResult>(result =>
+        List<CommonResult> commonResults = grapeDataResult.Results.ConvertAll<CommonResult>(result =>
             {
                 bool isFavorite = (bool?) result["IsFavorite"] == true;
                 return new CommonResult(
@@ -44,25 +40,17 @@ public class RepositoryManager : MonoBehaviour
         _grapeNeedUpdate = false;
     }
     
-    public void AddColor(Text text)
-    {
-        if (PreparingAddData(text)) return;
-        string hexColor = ColorUtility.ToHtmlStringRGB(AddToListHelper.current.color.color);
-        _back4AppHelper.AddColor(text.text, hexColor, AddToListRepository);
-        _colorNeedUpdate = true;
-    }
-    
     public void GetColor()
     {
         if (_colorNeedUpdate)
         {
-            _back4AppHelper.GetColors(OnGetColor);
+            _back4AppHelper.GetData(Back4appHelper.COLORS_CLASS, OnGetColor);
         }
     }
 
-    public void OnGetColor(CommonData commonData)
+    private void OnGetColor(GetDataResult getDataResult)
     {
-        List<CommonResult> commonResults = commonData.Results.ConvertAll<CommonResult>(result =>
+        List<CommonResult> commonResults = getDataResult.Results.ConvertAll<CommonResult>(result =>
             {
                 bool isFavorite = (bool?) result["IsFavorite"] == true;
                 return new CommonResult(
@@ -77,29 +65,15 @@ public class RepositoryManager : MonoBehaviour
         _colorNeedUpdate = false;
     }
 
-    public void AddRegion(Text regionText, Text countryText)
-    {
-        if (PreparingAddData(regionText)) return;
-        _back4AppHelper.AddRegion(regionText.text, countryText.text, AddToListRepository);
-    }
-
-    public void AddCountry(Text text)
-    {
-        if (PreparingAddData(text)) return;
-        string hexColor = ColorUtility.ToHtmlStringRGB(AddToListHelper.current.color.color);
-        _back4AppHelper.AddCountry(text.text, hexColor, AddToListRepository);
-        _countryNeedUpdate = true;
-    }
-
     public void GetCountries()
     {
         if (_countryNeedUpdate)
-            _back4AppHelper.GetCountries(OnGetCountries);
+            _back4AppHelper.GetData(Back4appHelper.COUNTRIES_CLASS, OnGetCountries);
     }
     
-    public void OnGetCountries(CommonData commonData)
+    private void OnGetCountries(GetDataResult getDataResult)
     {
-        List<CommonResult> commonResults = commonData.Results.ConvertAll<CommonResult>(result =>
+        List<CommonResult> commonResults = getDataResult.Results.ConvertAll<CommonResult>(result =>
             {
                 bool isFavorite = (bool?) result["IsFavorite"] == true;
                 return new CommonResult(
@@ -112,58 +86,5 @@ public class RepositoryManager : MonoBehaviour
         );
         GetFromListHelper.Current.GenerateList(commonResults);
         _countryNeedUpdate = false;
-    }
-
-    private bool PreparingAddData(Text text)
-    {
-        if (string.IsNullOrEmpty(text.text)) return true;
-        AddToListHelper.current.StartAddingData();
-        return false;
-    }
-
-    public void GetAllVines()
-    {
-        _back4AppHelper.GetVine(GetVineDataCallback);
-    }
-
-    public void GetColors()
-    {
-        _back4AppHelper.GetColors(DebugGetDataCallback);
-    }
-
-    public void UploadImage(Texture2D image)
-    {
-        _back4AppHelper.AddVine(image, DebugAddDataCallback);
-    }
-
-    public void GetVineDataCallback(CommonData commonData)
-    {
-        commonData.PrintResults();
-    }
-
-    public void AddToListRepository(AddDataCallback callback)
-    {
-        if (callback.ResponseCode == 201)
-        {
-            AddToListHelper.current.FinishedAddingData();
-        }
-        else
-        {
-            AddToListHelper.current.ErrorWhileAdding();
-        }
-    }
-    
-    void DebugGetDataCallback(CommonData data)
-    {
-        print(data.ResponseCode);
-        data.PrintResults();
-    }
-
-    private void DebugAddDataCallback(AddDataCallback data)
-    {
-        print(data.Json);
-        print(data.ResponseCode);
-        print(data.ObjectId);
-        print(data.CreatedAt);
-    }
+    }*/
 }

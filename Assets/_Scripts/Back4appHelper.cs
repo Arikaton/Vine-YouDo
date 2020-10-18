@@ -14,55 +14,57 @@ using UnityEngine.UI;
 
 public class Back4appHelper : MonoBehaviour
 {
-    public static string COUNTRIES = "Countries";
-    public static string REGIONS = "Regions";
-    public static string COLORS = "Colors";
-    public static string GRAPES = "Grapes";
-    public static string VINE = "Vine";
-    public delegate void OnEndAddDataCallback(AddDataCallback data);
-    public delegate void OnEndGetDataCallback(CommonData data);
+    public static string COUNTRIES_CLASS = "Countries";
+    public static string COUNTRIES_FIELD = "Country";
+    public static string REGIONS_CLASS = "Regions";
+    public static string REGION_FIELD = "Region";
+    public static string COLORS_CLASS = "Colors";
+    public static string COLOR_FIELD = "Color";
+    public static string GRAPES_CLASS = "Grapes";
+    public static string GRAPES_FIELD = "Grape";
+    public static string VINE_CLASS = "Vine";
+    public static string HEX = "HEX";
+    public delegate void OnEndAddDataCallback(AddDataResult data);
+    public delegate void OnEndGetDataCallback(GetDataResult dataResult);
 
     [SerializeField] private string parseApplicationId;
     [SerializeField] private string restApiKey;
 
-    public void AddColor(string color, string hex, OnEndAddDataCallback onEndAddDataCallback)
+    public void AddData(string type, Dictionary<string, object> data, OnEndAddDataCallback callback)
     {
-        StartCoroutine(AddColorCor(color, hex, onEndAddDataCallback));
+        StartCoroutine(AddDataCor(type, data, callback));
     }
 
-    public void GetColors(OnEndGetDataCallback onEndGetDataCallback)
+    private IEnumerator AddDataCor(string type, Dictionary<string, object> data, OnEndAddDataCallback callback)
     {
-        StartCoroutine(GetColorsCor(onEndGetDataCallback));
+        var stringData = JsonConvert.SerializeObject(data);
+        Debug.Log(stringData + "\n" + "https://parseapi.back4app.com/classes/" + type);
+        UnityWebRequest www = new UnityWebRequest("https://parseapi.back4app.com/classes/" + type);
+        www.method = "POST";
+        www.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(stringData));
+        SetHeaders(www);
+        www.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return www.SendWebRequest();
+        
+        Debug.Log(www.downloadHandler.text);
+        callback(new AddDataResult(www.downloadHandler.text, www.responseCode));
     }
 
-    public void AddCountry(string country, string hexColor, OnEndAddDataCallback onEndAddDataCallback)
+    public void GetData(string type, OnEndGetDataCallback callback)
     {
-        StartCoroutine(AddCountryCor(country, hexColor, onEndAddDataCallback));
+        StartCoroutine(GetDataCor(type, callback));
     }
 
-    public void GetCountries(OnEndGetDataCallback onEndGetDataCallback)
+    private IEnumerator GetDataCor(string type, OnEndGetDataCallback callback)
     {
-        StartCoroutine(GetCountriesCor(onEndGetDataCallback));
-    }
+        var www = UnityWebRequest.Get("https://parseapi.back4app.com/classes/" + type);
+        SetHeaders(www);
+        www.downloadHandler = new DownloadHandlerBuffer();
 
-    public void AddRegion(string region, string country, OnEndAddDataCallback onEndAddDataCallback)
-    {
-        StartCoroutine(AddRegionCor(region, country, onEndAddDataCallback));
-    }
-
-    public void GetRegions(OnEndGetDataCallback onEndGetDataCallback)
-    {
-        StartCoroutine(GetRegionsCor(onEndGetDataCallback));
-    }
-
-    public void AddGrape(string grape, string hex, OnEndAddDataCallback onEndAddDataCallback)
-    {
-        StartCoroutine(AddGrapeCor(grape, hex, onEndAddDataCallback));
-    }
-
-    public void GetGrapes(OnEndGetDataCallback onEndGetDataCallback)
-    {
-        StartCoroutine(GetGrapesCor(onEndGetDataCallback));
+        yield return www.SendWebRequest();
+        
+        callback(new GetDataResult(www.downloadHandler.text, www.responseCode));
     }
 
     public void DeleteObject(string objectId, string objectType)
@@ -73,9 +75,7 @@ public class Back4appHelper : MonoBehaviour
     private IEnumerator DeleteObjectCor(string objectId, string objectType)
     {
         var www = UnityWebRequest.Delete($"https://parseapi.back4app.com/classes/{objectType}/{objectId}");
-        www.SetRequestHeader("X-Parse-Application-Id", parseApplicationId);
-        www.SetRequestHeader("X-Parse-REST-API-Key", restApiKey);
-        www.SetRequestHeader("Content-Type", "application/json");
+        SetHeaders(www);
         www.downloadHandler = new DownloadHandlerBuffer();
         yield return www.SendWebRequest();
     }
@@ -88,156 +88,24 @@ public class Back4appHelper : MonoBehaviour
     private IEnumerator UpdateFavoriteCor(bool isFavorite, string objectId, string type)
     {
         var data = JsonConvert.SerializeObject(new Dictionary<string, bool>() {{"IsFavorite", isFavorite}});
-        var www = UnityWebRequest.Put($"https://parseapi.back4app.com/classes/{type}/{objectId}", UTF8Encoding.UTF8.GetBytes(data));
-        www.SetRequestHeader("X-Parse-Application-Id", parseApplicationId);
-        www.SetRequestHeader("X-Parse-REST-API-Key", restApiKey);
-        www.SetRequestHeader("Content-Type", "application/json");
+        var www = UnityWebRequest.Put($"https://parseapi.back4app.com/classes/{type}/{objectId}", Encoding.UTF8.GetBytes(data));
+        SetHeaders(www);
         www.downloadHandler = new DownloadHandlerBuffer();
 
         yield return www.SendWebRequest();
         Debug.Log(www.downloadHandler.text);
     }
 
-    public void GetVine(OnEndGetDataCallback onEndGetDataCallback)
+    private void SetHeaders(UnityWebRequest www)
     {
-        StartCoroutine(GetVineCor(onEndGetDataCallback));
+        www.SetRequestHeader("X-Parse-Application-Id", parseApplicationId);
+        www.SetRequestHeader("X-Parse-REST-API-Key", restApiKey);
+        www.SetRequestHeader("Content-Type", "application/json");
     }
 
     public void AddVine(Texture2D image, OnEndAddDataCallback onEndAddDataCallback, string color = "",  string grape = "", string country = "", string region = "")
     {
         StartCoroutine(UploadImageToServerCor(image, color, grape, country, region, onEndAddDataCallback));
-    }
-
-    IEnumerator AddColorCor(string color, string hex, OnEndAddDataCallback onEndAddDataCallback)
-    {
-        var data = CreateDataFromDict(new Dictionary<string, string>() {{"Color", color}, {"HEX", hex}});
-        var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + COLORS);
-        www.method = "POST";
-        www.uploadHandler = new UploadHandlerRaw(UTF8Encoding.UTF8.GetBytes(data));
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-        
-        onEndAddDataCallback(new AddDataCallback(www.downloadHandler.text, www.responseCode));
-    }
-
-    IEnumerator GetColorsCor(OnEndGetDataCallback onEndGetDataCallback)
-    {
-        UnityWebRequest www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + COLORS);
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-        
-        print(www.downloadHandler.text);
-        
-        onEndGetDataCallback(new CommonData(www.downloadHandler.text, www.responseCode));
-
-    }
-    
-    IEnumerator AddCountryCor(string country, string hexColor, OnEndAddDataCallback onEndAddDataCallback)
-    {
-        var data = CreateDataFromDict(new Dictionary<string, string>() {{"Country", country}, {"HEX", hexColor}});
-        var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + COUNTRIES);
-        www.method = "POST";
-        www.uploadHandler = new UploadHandlerRaw(UTF8Encoding.UTF8.GetBytes(data));
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-        
-        onEndAddDataCallback(new AddDataCallback(www.downloadHandler.text, www.responseCode));
-    }
-    
-    IEnumerator GetCountriesCor(OnEndGetDataCallback onEndGetDataCallback)
-    {
-        var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + COUNTRIES);
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-        
-        onEndGetDataCallback(new CommonData(www.downloadHandler.text, www.responseCode));
-    }
-
-    IEnumerator AddRegionCor(string region, string country, OnEndAddDataCallback onEndAddDataCallback)
-    {
-        var data = CreateDataFromDict(new Dictionary<string, string>() {{"Region", region}, {"Country", country}});
-        var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + REGIONS);
-        www.method = "POST";
-        www.uploadHandler = new UploadHandlerRaw(UTF8Encoding.UTF8.GetBytes(data));
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-        
-        onEndAddDataCallback(new AddDataCallback(www.downloadHandler.text, www.responseCode));
-    }
-    
-    IEnumerator GetRegionsCor(OnEndGetDataCallback onEndGetDataCallback)
-    {
-        var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + REGIONS);
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-        
-        onEndGetDataCallback(new CommonData(www.downloadHandler.text, www.responseCode));
-    }
-    
-    IEnumerator AddGrapeCor(string grape, string hex, OnEndAddDataCallback onEndAddDataCallback)
-    {
-        var data = CreateDataFromDict(new Dictionary<string, string>(){{"Grape", grape},{"HEX", hex}});
-        var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + GRAPES);
-        www.method = "POST";
-        www.uploadHandler = new UploadHandlerRaw(UTF8Encoding.UTF8.GetBytes(data));
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-        
-        onEndAddDataCallback(new AddDataCallback(www.downloadHandler.text, www.responseCode));
-    }
-    
-    IEnumerator GetGrapesCor(OnEndGetDataCallback onEndGetDataCallback)
-    {
-        var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + GRAPES);
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-        
-        onEndGetDataCallback(new CommonData(www.downloadHandler.text, www.responseCode));
-    }
-
-    IEnumerator GetVineCor(OnEndGetDataCallback onEndGetDataCallback)
-    {
-        var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + VINE);
-        www.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-        
-        onEndGetDataCallback(new CommonData(www.downloadHandler.text, www.responseCode));
-    }
-    
-    IEnumerator AddVineCor(string imageUrl, string imageName, string color,  string grape, string country, string region, OnEndAddDataCallback onEndAddDataCallback)
-    {
-        Dictionary<string, string> data = new Dictionary<string, string>();
-        if (color != "")
-            data.Add("Color", color);
-        if (grape != "")
-            data.Add("Grape", grape);
-        if (country != "")
-            data.Add("Country", country);
-        if (region != "")
-            data.Add("Region", region);
-
-        var imageData = string.Format("{{\"name\":\"{0}\",\"url\":\"{1}\",\"__type\":\"File\"}}", imageName, imageUrl);
-        
-        data.Add("Image", imageData);
-        var www = CreateRequestAndSetHeaders("https://parseapi.back4app.com/classes/" + VINE);
-        www.method = "POST";
-        www.downloadHandler = new DownloadHandlerBuffer();
-        www.uploadHandler = new UploadHandlerRaw(UTF8Encoding.UTF8.GetBytes(CreateDataFromDict(data)));
-        //print(CreateDataFromDict(data));
-
-        yield return www.SendWebRequest();
-
-        print(www.downloadHandler.text);
-        onEndAddDataCallback(new AddDataCallback(www.downloadHandler.text, www.responseCode));
     }
 
     IEnumerator DownloadImageFromServerCor(string url)
@@ -259,9 +127,7 @@ public class Back4appHelper : MonoBehaviour
         data.Add(new MultipartFormFileSection(imageByteData));
 
         var www = new UnityWebRequest("https://parseapi.back4app.com/files/UnityImage.jpg");
-        www.SetRequestHeader("X-Parse-Application-Id", parseApplicationId);
-        www.SetRequestHeader("X-Parse-REST-API-Key", restApiKey);
-        www.SetRequestHeader("Content-Type", "image/jpg");
+        SetHeaders(www);
         www.method = "POST";
         www.uploadHandler = new UploadHandlerFile(Application.dataPath + "/Sprites/Backgrounds/мОрдынка.jpg");
         
@@ -274,27 +140,13 @@ public class Back4appHelper : MonoBehaviour
             StartCoroutine(DownloadImageFromServerCor(imageData.url));
             print(imageData.name);
             print(imageData.url);
-            StartCoroutine(AddVineCor(imageData.url, imageData.name, color, grape, country, region,
-                onEndAddDataCallback));
+            /*StartCoroutine(AddVineCor(imageData.url, imageData.name, color, grape, country, region,
+                onEndAddDataCallback));*/
         }
-    }
-
-    private string CreateDataFromDict(Dictionary<string, string> query)
-    {
-        return JsonConvert.SerializeObject(query);
-    }
-
-    private UnityWebRequest CreateRequestAndSetHeaders(string url)
-    {
-        UnityWebRequest www = new UnityWebRequest(url);
-        www.SetRequestHeader("X-Parse-Application-Id", parseApplicationId);
-        www.SetRequestHeader("X-Parse-REST-API-Key", restApiKey);
-        www.SetRequestHeader("Content-Type", "application/json");
-        return www;
     }
 }
 
-public class AddDataCallback
+public class AddDataResult
 {
     public long ResponseCode
     {
@@ -310,7 +162,7 @@ public class AddDataCallback
     public string ObjectId { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    public AddDataCallback(string json, long responseCode)
+    public AddDataResult(string json, long responseCode)
     {
         Json = json;
         ResponseCode = responseCode;
@@ -325,17 +177,26 @@ public class AddDataCallback
     }
 }
 
-public class CommonData
+public class GetDataResult
 {
     public long ResponseCode { get; private set; }
     public string Json { get; private set; }
     public List<JToken> Results { get; private set; }
 
-    public CommonData(string json, long responseCode)
+    public string resultsString;
+
+    public GetDataResult(string json, long responseCode)
     {
         ResponseCode = responseCode;
         Json = json;
+        resultsString = JObject.Parse(json)["results"].ToString();
         Results = JObject.Parse(json)["results"].Children().ToList();
+    }
+
+    public GetDataResult(string resultsString)
+    {
+        this.resultsString = resultsString;
+        ResponseCode = 200;
     }
 
     public void PrintResults()
