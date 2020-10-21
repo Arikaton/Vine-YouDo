@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class AddVineManager : MonoBehaviour
 {
+    public static AddVineManager Main;
+    
     [SerializeField] private GameObject grapeObject;
     [SerializeField] private GameObject colorObject;
     [SerializeField] private GameObject countryObject;
@@ -20,6 +22,11 @@ public class AddVineManager : MonoBehaviour
     public int count;
 
     private Texture2D _image;
+
+    private void Awake()
+    {
+        Main = this;
+    }
 
     public void SetImage(Texture2D image)
     {

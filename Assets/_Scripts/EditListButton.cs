@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace _Scripts
 {
-    public class EditListButton : MonoBehaviour
+    public class EditListButton : MonoBehaviour, IInitable
     {
         private static EditListButton _active;
         
@@ -25,7 +25,7 @@ namespace _Scripts
             IsFavorite = isFavorite;
             UpdateFavoriteIcon();
         }
-
+        
         public void ShowMenu()
         {
             if (_active != null)

@@ -13,10 +13,10 @@ namespace _Scripts
 
         [SerializeField] private Back4appHelper _back4AppHelper;
         [SerializeField] private Transform scrollViewContent;
-        [SerializeField] private EditListButton buttonPrefab;
+        [SerializeField] private GameObject buttonPrefab;
         [SerializeField] private GameObject loadingAnimation;
         [SerializeField] private GameObject errorMessage;
-        [SerializeField] private string type;
+        public string type;
         
         private void OnEnable()
         {
@@ -170,7 +170,8 @@ namespace _Scripts
 
             foreach (var result in orderedEnumerable)
             {
-                var newButton = Instantiate(buttonPrefab, scrollViewContent);
+                var newButtonGo = Instantiate(buttonPrefab, scrollViewContent);
+                IInitable newButton = newButtonGo.GetComponent<IInitable>();
                 if (ColorUtility.TryParseHtmlString("#" + result.hexColor, out var buttonColor))
                 {
                     newButton.Init(buttonColor, result.name, result.isFavorite, result.objectId);
@@ -190,6 +191,32 @@ namespace _Scripts
         public void DeleteObject(string objectId)
         {
             _back4AppHelper.DeleteObject(objectId, type);
+        }
+
+        public void ChooseObject(Text text)
+        {
+            if (type == Back4appHelper.GRAPES_CLASS)
+            {
+                AddVineManager.Main.grape = text.text;
+            }
+            else if (type == Back4appHelper.COLORS_CLASS)
+            {
+                AddVineManager.Main.color = text.text;
+            }
+            else if (type == Back4appHelper.COUNTRIES_CLASS)
+            {
+                AddVineManager.Main.country = text.text;
+            }
+            else if (type == Back4appHelper.REGIONS_CLASS)
+            {
+                AddVineManager.Main.region = text.text;
+            }
+            else
+            {
+                throw new Exception("Wrong type");
+            }
+            UIManager.Main.ShowWindow(UIManager.Main.addVineMain);
+            AddVineManager.Main.UpdateFields();
         }
 
         public void UpdateFavorite(bool isFavorite, string objectId)
