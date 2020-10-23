@@ -104,9 +104,13 @@ namespace _Scripts
                 List<CommonResult> commonResults = new List<CommonResult>();
                 foreach (var data in deserializedObject)
                 {
-                    bool isFavorite = (bool?) data["IsFavorite"] == true;
+                    bool isFavorite = false;
+                    string hexColor = "3192EB";
+                    if (data.ContainsKey("IsFavorite"))
+                        isFavorite = (bool?) data["IsFavorite"] == true;
                     string objectId = data["objectId"].ToString();
-                    string hexColor = data[Back4appHelper.HEX].ToString();
+                    if (data.ContainsKey(Back4appHelper.HEX))
+                        hexColor = data[Back4appHelper.HEX].ToString();
                     string name = "";
                     if (type == Back4appHelper.GRAPES_CLASS)
                     {
@@ -130,6 +134,7 @@ namespace _Scripts
                     }
 
                     var newResult = new CommonResult(name, hexColor, isFavorite, objectId);
+                    Debug.Log($"{name} {hexColor}");
                     commonResults.Add(newResult);
                 }
                 GenerateList(commonResults);
@@ -175,6 +180,10 @@ namespace _Scripts
                 if (ColorUtility.TryParseHtmlString("#" + result.hexColor, out var buttonColor))
                 {
                     newButton.Init(buttonColor, result.name, result.isFavorite, result.objectId);
+                }
+                else
+                {
+                    throw new Exception("Error while parsing color");
                 }
             }
             //FilterListByFavorite();

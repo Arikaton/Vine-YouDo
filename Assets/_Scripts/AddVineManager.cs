@@ -7,7 +7,8 @@ using UnityEngine.UI;
 public class AddVineManager : MonoBehaviour
 {
     public static AddVineManager Main;
-    
+
+    [SerializeField] private Back4appHelper _back4AppHelper;
     [SerializeField] private GameObject grapeObject;
     [SerializeField] private GameObject colorObject;
     [SerializeField] private GameObject countryObject;
@@ -22,15 +23,30 @@ public class AddVineManager : MonoBehaviour
     public int count;
 
     private Texture2D _image;
+    private string _imagePath;
+    
+    public void Save()
+    {
+        if (String.IsNullOrEmpty(grape) && 
+            String.IsNullOrEmpty(color) && 
+            String.IsNullOrEmpty(country) && 
+            String.IsNullOrEmpty(region) &&
+            String.IsNullOrEmpty(year.ToString()) &&
+            String.IsNullOrEmpty(description) &&
+            String.IsNullOrEmpty(count.ToString()))
+        {
+        }
+    }
 
     private void Awake()
     {
         Main = this;
     }
 
-    public void SetImage(Texture2D image)
+    public void SetImage(Texture2D image, string imagePath)
     {
         _image = image;
+        _imagePath = imagePath;
     }
 
     public void UpdateFields()
@@ -84,5 +100,7 @@ public class AddVineManager : MonoBehaviour
     {
         description = value;
     }
+
+    
     
 }

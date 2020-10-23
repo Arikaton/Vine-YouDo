@@ -137,11 +137,7 @@ public class Back4appHelper : MonoBehaviour
         if (!www.isHttpError)
         {
             UploadImageData imageData = JsonConvert.DeserializeObject<UploadImageData>(www.downloadHandler.text);
-            StartCoroutine(DownloadImageFromServerCor(imageData.url));
-            print(imageData.name);
-            print(imageData.url);
-            /*StartCoroutine(AddVineCor(imageData.url, imageData.name, color, grape, country, region,
-                onEndAddDataCallback));*/
+
         }
     }
 }

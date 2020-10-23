@@ -29,6 +29,13 @@ public class CameraManager : MonoBehaviour
     public void Save()
     {
         if (_newPhoto != null)
-            _addVineManager.SetImage(_newPhoto);
+        {
+            _addVineManager.SetImage(_newPhoto, _newPhoto.);
+
+        }
+        else
+        {
+            throw new Exception("Photo is null");
+        }
     }
 }
