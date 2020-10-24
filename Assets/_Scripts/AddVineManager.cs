@@ -21,21 +21,39 @@ public class AddVineManager : MonoBehaviour
     public int year;
     public string description;
     public int count;
+    public string cellar;
+    public string name;
 
     private Texture2D _image;
     private string _imagePath;
     
     public void Save()
     {
-        if (String.IsNullOrEmpty(grape) && 
-            String.IsNullOrEmpty(color) && 
-            String.IsNullOrEmpty(country) && 
-            String.IsNullOrEmpty(region) &&
-            String.IsNullOrEmpty(year.ToString()) &&
-            String.IsNullOrEmpty(description) &&
-            String.IsNullOrEmpty(count.ToString()))
+        if (!String.IsNullOrEmpty(grape) && 
+            !String.IsNullOrEmpty(color) && 
+            !String.IsNullOrEmpty(country) && 
+            !String.IsNullOrEmpty(region) &&
+            !String.IsNullOrEmpty(year.ToString()) &&
+            !String.IsNullOrEmpty(name) &&
+            !String.IsNullOrEmpty(count.ToString()))
         {
+            var vineData = new VineData(
+                color,
+                grape,
+                region,
+                country,
+                description,
+                count,
+                year,
+                cellar, 
+                name);
+            _back4AppHelper.UploadImage(_imagePath, vineData);
         }
+    }
+
+    public void SetCellar(string cellar)
+    {
+        this.cellar = cellar;
     }
 
     private void Awake()
@@ -71,6 +89,11 @@ public class AddVineManager : MonoBehaviour
             regionObject.SetActive(true);
             regionObject.GetComponentInChildren<Text>().text = region;
         }
+    }
+
+    public void OnChangeName(string name)
+    {
+        this.name = name;
     }
 
     public void OnChangeYear(string value)

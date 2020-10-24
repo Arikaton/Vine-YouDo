@@ -12,25 +12,27 @@ public class CameraManager : MonoBehaviour
     [SerializeField] GameObject cameraCanvas;
     
     private Texture2D _newPhoto;
+    private string _path;
 
     public void TakePhoto()
     {
-        NativeCamera.TakePicture(OnTakePicture, 512);
+        NativeCamera.TakePicture(OnTakePicture, 1000);
     }
 
     private void OnTakePicture(string path)
     {
+        _newPhoto = NativeCamera.LoadImageAtPath(path);
+        _path = path;
+        image.texture = _newPhoto;
         if (!string.IsNullOrEmpty(path) && cameraCanvas != image.transform.parent.gameObject)
             _uiManager.ShowWindow(cameraCanvas);
-        _newPhoto = NativeCamera.LoadImageAtPath(path);
-        image.texture = _newPhoto;
     }
 
     public void Save()
     {
         if (_newPhoto != null)
         {
-            _addVineManager.SetImage(_newPhoto, _newPhoto.);
+            _addVineManager.SetImage(_newPhoto, _path);
 
         }
         else

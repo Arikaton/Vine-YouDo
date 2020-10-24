@@ -27,6 +27,8 @@ public class Back4appHelper : MonoBehaviour
     public delegate void OnEndAddDataCallback(AddDataResult data);
     public delegate void OnEndGetDataCallback(GetDataResult dataResult);
 
+    public delegate void OnGetVineList(List<VineData> vines);
+
     [SerializeField] private string parseApplicationId;
     [SerializeField] private string restApiKey;
 
@@ -49,6 +51,19 @@ public class Back4appHelper : MonoBehaviour
         
         Debug.Log(www.downloadHandler.text);
         callback(new AddDataResult(www.downloadHandler.text, www.responseCode));
+    }
+
+    IEnumerator AddDataCor(string type, string data)
+    {
+        UnityWebRequest www = new UnityWebRequest("https://parseapi.back4app.com/classes/" + type);
+        www.method = "POST";
+        www.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(data));
+        SetHeaders(www);
+        www.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return www.SendWebRequest();
+        
+        Debug.Log(www.downloadHandler.text);
     }
 
     public void GetData(string type, OnEndGetDataCallback callback)
@@ -85,6 +100,11 @@ public class Back4appHelper : MonoBehaviour
         StartCoroutine(UpdateFavoriteCor(isFavorite, objectId, type));
     }
 
+    public void UploadImage(string path, VineData vineData)
+    {
+        StartCoroutine(UploadImageToServerCor(path, vineData));
+    }
+
     private IEnumerator UpdateFavoriteCor(bool isFavorite, string objectId, string type)
     {
         var data = JsonConvert.SerializeObject(new Dictionary<string, bool>() {{"IsFavorite", isFavorite}});
@@ -103,11 +123,6 @@ public class Back4appHelper : MonoBehaviour
         www.SetRequestHeader("Content-Type", "application/json");
     }
 
-    public void AddVine(Texture2D image, OnEndAddDataCallback onEndAddDataCallback, string color = "",  string grape = "", string country = "", string region = "")
-    {
-        StartCoroutine(UploadImageToServerCor(image, color, grape, country, region, onEndAddDataCallback));
-    }
-
     IEnumerator DownloadImageFromServerCor(string url)
     {
         var www = UnityWebRequestTexture.GetTexture(url);
@@ -120,25 +135,48 @@ public class Back4appHelper : MonoBehaviour
         print(Application.dataPath);
     }
 
-    IEnumerator UploadImageToServerCor(Texture2D image, string color, string grape, string country, string region, OnEndAddDataCallback onEndAddDataCallback)
+    IEnumerator UploadImageToServerCor(string path, VineData data)
     {
-        List<IMultipartFormSection> data = new List<IMultipartFormSection>();
-        var imageByteData = File.ReadAllBytes(Application.dataPath + "/Sprites/Backgrounds/мОрдынка.jpg");
-        data.Add(new MultipartFormFileSection(imageByteData));
-
         var www = new UnityWebRequest("https://parseapi.back4app.com/files/UnityImage.jpg");
         SetHeaders(www);
         www.method = "POST";
-        www.uploadHandler = new UploadHandlerFile(Application.dataPath + "/Sprites/Backgrounds/мОрдынка.jpg");
-        
+        www.uploadHandler = new UploadHandlerFile(path);
         www.downloadHandler = new DownloadHandlerBuffer();
 
         yield return www.SendWebRequest();
         if (!www.isHttpError)
         {
             UploadImageData imageData = JsonConvert.DeserializeObject<UploadImageData>(www.downloadHandler.text);
-
+            data.Image = new Dictionary<string, string>()
+            {
+                {"__type", "File"},
+                {"name", imageData.name},
+                {"url", imageData.url}
+            };
+            StartCoroutine(AddDataCor(Back4appHelper.VINE_CLASS, JsonConvert.SerializeObject(data)));
         }
+        else
+        {
+            Debug.LogWarning(www.error);
+            Debug.Log(www.downloadHandler.text);
+        }
+    }
+
+    public void GetVine(string cellar, OnGetVineList onGetVineList)
+    {
+        StartCoroutine(GetVineCor(cellar, onGetVineList));
+    }
+
+    IEnumerator GetVineCor(string cellar, OnGetVineList onGetVineList)
+    {
+        var www = new UnityWebRequest("https://parseapi.back4app.com/classes/Vine");
+        SetHeaders(www);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes($"where={{\"Cellar\":\"{cellar}\"}}"));
+        yield return www.SendWebRequest();
+        
+        var vineList = JObject.Parse(www.downloadHandler.text)["results"].ToString();
+        onGetVineList(JsonConvert.DeserializeObject<List<VineData>>(vineList));
     }
 }
 
@@ -235,7 +273,8 @@ public class UploadImageData
     }
 }
 
-class VineData
+[Serializable]
+public class VineData
 {
     public String objectId;
     public string Color;
@@ -243,4 +282,35 @@ class VineData
     public string Region;
     public string Country;
     public string Description;
+    public string Name;
+    public string Cellar;
+    public int Count;
+    public int Year;
+    public Dictionary<string, string> Image;
+
+    public VineData(string color, string grape, string region, string country, string description, int count, int year, string cellar, string name)
+    {
+        Color = color;
+        Grape = grape;
+        Region = region;
+        Country = country;
+        Description = description;
+        Count = count;
+        Year = year;
+        Cellar = cellar;
+        Name = name;
+    }
+
+    public override string ToString()
+    {
+        return $"Название: {Name}\nВиноград: {Grape}\nЦвет: {Color}\nРегион: {Region}\nСтрана: {Country}\nОписание: {Description}\nПогреб: {Cellar}\nКол-во: {Count}\nГод: {Year}";
+    }
+}
+
+public enum VineDataType
+{
+    Grape,
+    Color,
+    Region,
+    Country
 }

@@ -20,9 +20,10 @@ namespace _Scripts
         
         private void OnEnable()
         {
-            GetData();
             Current = this;
             errorMessage.SetActive(false);
+            loadingAnimation.SetActive(false);
+            GetData();
         }
 
         public void GetData()
@@ -82,10 +83,14 @@ namespace _Scripts
             }
             else
             {
-                if (scrollViewContent.childCount != 0)
+                if (scrollViewContent.childCount == 0)
                 {
                     Debug.Log("Data getting from local storage");
                     OnGetData(data);
+                }
+                else
+                {
+                    loadingAnimation.SetActive(false);
                 }
             }
         }
@@ -134,7 +139,6 @@ namespace _Scripts
                     }
 
                     var newResult = new CommonResult(name, hexColor, isFavorite, objectId);
-                    Debug.Log($"{name} {hexColor}");
                     commonResults.Add(newResult);
                 }
                 GenerateList(commonResults);
@@ -186,7 +190,6 @@ namespace _Scripts
                     throw new Exception("Error while parsing color");
                 }
             }
-            //FilterListByFavorite();
         }
 
         public void DeleteChildren()
@@ -231,6 +234,11 @@ namespace _Scripts
         public void UpdateFavorite(bool isFavorite, string objectId)
         {
             _back4AppHelper.UpdateFavorite(isFavorite, objectId, type);
+        }
+
+        public void AddToFilter(bool isAddedToFilter, Color color, string text)
+        {
+            GetVineManager.main.AddToFilter(type, isAddedToFilter, color, text);
         }
 
         public void FilterListByFavorite()
