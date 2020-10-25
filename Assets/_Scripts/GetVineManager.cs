@@ -9,6 +9,7 @@ using UnityEngine.UI;
 public class GetVineManager : MonoBehaviour
 {
     public static GetVineManager main;
+    public Action OnReset;
     
     [SerializeField] private UIManager _uiManager;
     [SerializeField] private Back4appHelper _back4AppHelper;
@@ -71,15 +72,15 @@ public class GetVineManager : MonoBehaviour
                 vineHandler = new List<VineData>();
                 year = vineData.Year;
                 vineHandler.Add(vineData);
-                if (i == orderedVine.Count - 1)
-                {
-                    var lastVineScroll = Instantiate(vineScollPrefab, vineContentWindow);
-                    lastVineScroll.Init(year.ToString(), vineHandler);
-                }
             }
             else
             {
                 vineHandler.Add(vineData);
+            }
+            if (i == orderedVine.Count - 1)
+            {
+                var lastVineScroll = Instantiate(vineScollPrefab, vineContentWindow);
+                lastVineScroll.Init(year.ToString(), vineHandler);
             }
         }
     }
@@ -114,14 +115,12 @@ public class GetVineManager : MonoBehaviour
         }
     }
 
-    public void DestroyChilds(Transform transform)
+    public void DestroyChilds(Transform otherTransform)
     {
-        if (transform.childCount == 0)
-            return;
-        for (int i = 0; i < transform.childCount; i++)
+        foreach (Transform child in otherTransform)
         {
-            Destroy(grapeContentWindow.GetChild(i).gameObject);
-        }        
+            Destroy(child.gameObject);
+        }
     }
 
     public void UpdateChips(Dictionary<string, Color> dictionary, Transform contentWindow)
@@ -142,6 +141,11 @@ public class GetVineManager : MonoBehaviour
         colors = new Dictionary<string, Color>();
         countries = new Dictionary<string, Color>();
         regions = new Dictionary<string, Color>();
+        DestroyChilds(grapeContentWindow);
+        DestroyChilds(colorContentWindow);
+        DestroyChilds(countryContentWindow);
+        DestroyChilds(regionContentWindow);
+        OnReset?.Invoke();
     }
 
     public void AddToFilter(string type, bool isAddedToFilter, Color color, string text)

@@ -95,6 +95,21 @@ public class Back4appHelper : MonoBehaviour
         yield return www.SendWebRequest();
     }
 
+    public void UpdateData(string objectId, string type, string data)
+    {
+        StartCoroutine(UpdateDataCor(objectId, type, data));
+    }
+
+    IEnumerator UpdateDataCor(string objectId, string type, string data)
+    {
+        var www = UnityWebRequest.Put($"https://parseapi.back4app.com/classes/{type}/{objectId}", Encoding.UTF8.GetBytes(data));
+        SetHeaders(www);
+        www.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return www.SendWebRequest();
+        Debug.Log(www.downloadHandler.text);
+    }
+
     public void UpdateFavorite(bool isFavorite, string objectId, string type)
     {
         StartCoroutine(UpdateFavoriteCor(isFavorite, objectId, type));

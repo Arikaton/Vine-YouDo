@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class VineCard : MonoBehaviour
+public class VineCard : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private RawImage _image;
     [SerializeField] private GameObject downloadAnim;
@@ -25,5 +26,21 @@ public class VineCard : MonoBehaviour
         _texture2D = DownloadHandlerTexture.GetContent(www);
         _image.texture = _texture2D;
         downloadAnim.SetActive(false);
+    }
+
+    public void ShowCardView()
+    {
+        VineView.main.SetData(_vineData, _texture2D, gameObject);
+        UIManager.Main.ShowVineView();
+    }
+
+    public void UpdateCount(int count)
+    {
+        _vineData.Count = count;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        ShowCardView();
     }
 }
