@@ -9,6 +9,7 @@ public class VineView : MonoBehaviour
 {
     public static VineView main;
 
+    [SerializeField] private GameObject whichOneWindow;
     [SerializeField] private Back4appHelper _back4AppHelper;
     [SerializeField] private RawImage image;
     [SerializeField] private Text nameText;
@@ -51,8 +52,11 @@ public class VineView : MonoBehaviour
     public void ChangePlace(string cellar)
     {
         Destroy(_cardObj);
-        _back4AppHelper.UpdateData(_vineData.objectId, Back4appHelper.VINE_CLASS, 
+        _back4AppHelper.UpdateData(
+            _vineData.objectId, 
+            Back4appHelper.VINE_CLASS, 
             JsonConvert.SerializeObject(new Dictionary<string, string>(){{"Cellar", cellar}}));
+        UIManager.Main.ShowWindow(whichOneWindow);
     }
 
     public void Drink()
@@ -61,7 +65,7 @@ public class VineView : MonoBehaviour
         {
             _back4AppHelper.DeleteObject(_vineData.objectId, Back4appHelper.VINE_CLASS);
             Destroy(_cardObj);
-            UIManager.Main.GoBack();
+            UIManager.Main.ShowWindow(whichOneWindow);
         }
         else
         {

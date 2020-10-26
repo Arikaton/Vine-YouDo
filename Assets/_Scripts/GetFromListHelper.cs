@@ -174,8 +174,8 @@ namespace _Scripts
             DeleteChildren();
 
             var orderedEnumerable = commonResults
-                .OrderBy(x => x.isFavorite)
-                .ThenBy(x => x.name);
+                .OrderBy(x => x.isFavorite ? 0 : 1)
+                .ThenBy(x => x.name).ToList();
 
             foreach (var result in orderedEnumerable)
             {

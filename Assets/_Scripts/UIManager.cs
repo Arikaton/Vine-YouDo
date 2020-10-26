@@ -6,7 +6,7 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public static UIManager Main;
-    Stack<GameObject> windowsStack = new Stack<GameObject>();
+    //Stack<GameObject> windowsStack = new Stack<GameObject>();
     
     [SerializeField] private GameObject prevWindow;
     [SerializeField] private GameObject vineView;
@@ -15,22 +15,22 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         Main = this;
-        windowsStack.Push(prevWindow);
+        //windowsStack.Push(prevWindow);
     }
 
     public void ShowWindow(GameObject window)
     {
-        windowsStack.Push(window);
+        //windowsStack.Push(window);
         window.SetActive(true);
         prevWindow.SetActive(false);
         prevWindow = window;
     }
 
-    public void GoBack()
+    /*public void GoBack()
     {
-        windowsStack.Pop();
-        ShowWindow(windowsStack.Peek());
-    }
+        //windowsStack.Pop();
+        //ShowWindow(windowsStack.Peek());
+    }*/
 
     public void ShowVineView()
     {

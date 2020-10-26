@@ -8,6 +8,7 @@ public class AddVineManager : MonoBehaviour
 {
     public static AddVineManager Main;
 
+    [SerializeField] private GameObject rootWindow;
     [SerializeField] private Back4appHelper _back4AppHelper;
     [SerializeField] private GameObject grapeObject;
     [SerializeField] private GameObject colorObject;
@@ -48,6 +49,7 @@ public class AddVineManager : MonoBehaviour
                 cellar, 
                 name);
             _back4AppHelper.UploadImage(_imagePath, vineData);
+            UIManager.Main.ShowWindow(rootWindow);
         }
     }
 

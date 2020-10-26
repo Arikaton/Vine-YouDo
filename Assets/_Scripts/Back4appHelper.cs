@@ -184,10 +184,10 @@ public class Back4appHelper : MonoBehaviour
 
     IEnumerator GetVineCor(string cellar, OnGetVineList onGetVineList)
     {
-        var www = new UnityWebRequest("https://parseapi.back4app.com/classes/Vine");
+        var filter = $"where={{\"Cellar\":\"{cellar}\"}}";
+        var www = new UnityWebRequest("https://parseapi.back4app.com/classes/Vine?"+filter);
         SetHeaders(www);
         www.downloadHandler = new DownloadHandlerBuffer();
-        www.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes($"where={{\"Cellar\":\"{cellar}\"}}"));
         yield return www.SendWebRequest();
         
         var vineList = JObject.Parse(www.downloadHandler.text)["results"].ToString();

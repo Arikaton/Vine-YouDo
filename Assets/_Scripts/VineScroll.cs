@@ -29,7 +29,7 @@ public class VineScroll : MonoBehaviour
             firstStart = false;
             return;
         }
-        if (content.childCount == 0)
+        if (content.childCount == 1)
         {
             Destroy(gameObject);
         }

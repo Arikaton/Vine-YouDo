@@ -23,6 +23,8 @@ public class AddToListHelper : MonoBehaviour
 
     public void StartAddingData(Text text)
     {
+        if (string.IsNullOrEmpty(text.text))
+            return;
         downloadImage.SetActive(true);
         successText.SetActive(false);
         errorText.SetActive(false);

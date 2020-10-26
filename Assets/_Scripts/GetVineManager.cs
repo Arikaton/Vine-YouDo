@@ -44,6 +44,8 @@ public class GetVineManager : MonoBehaviour
 
     void OnGetVine(List<VineData> vines)
     {
+        if (vines.Count == 0)
+            return;
         var orderedVine = vines.OrderBy(x => x.Year).ToList();
         if (_useFilter)
         {
@@ -145,6 +147,7 @@ public class GetVineManager : MonoBehaviour
         DestroyChilds(colorContentWindow);
         DestroyChilds(countryContentWindow);
         DestroyChilds(regionContentWindow);
+        DestroyChilds(vineContentWindow);
         OnReset?.Invoke();
     }
 
