@@ -24,7 +24,12 @@ public class VineCard : MonoBehaviour, IPointerClickHandler
         var www = UnityWebRequestTexture.GetTexture(_vineData.Image["url"]);
         yield return www.SendWebRequest();
         _texture2D = DownloadHandlerTexture.GetContent(www);
-        _image.texture = RotateTexture(_texture2D, true);
+#if UNITY_IOS
+        _image.texture = _texture2D;
+#else
+        _texture2D = RotateTexture(_texture2D, true);
+        _image.texture = _texture2D;
+#endif
         downloadAnim.SetActive(false);
     }
 
@@ -44,7 +49,7 @@ public class VineCard : MonoBehaviour, IPointerClickHandler
         ShowCardView();
     }
     
-    Texture2D RotateTexture(Texture2D originalTexture, bool clockwise)
+    public static Texture2D RotateTexture(Texture2D originalTexture, bool clockwise)
     {
         Color32[] original = originalTexture.GetPixels32();
         Color32[] rotated = new Color32[original.Length];
