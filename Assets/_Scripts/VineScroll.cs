@@ -10,7 +10,6 @@ public class VineScroll : MonoBehaviour
     [SerializeField] private Text text;
     [SerializeField] private Transform content;
     [SerializeField] private VineCard vineCardPrefab;
-    private bool firstStart = true;
 
     public void Init(string year, List<VineData> vineDatas)
     {
@@ -19,19 +18,6 @@ public class VineScroll : MonoBehaviour
         {
             var vineCard = Instantiate(vineCardPrefab, content);
             vineCard.Init(vineData);
-        }
-    }
-
-    private void OnEnable()
-    {
-        if (firstStart)
-        {
-            firstStart = false;
-            return;
-        }
-        if (content.childCount == 0)
-        {
-            Destroy(gameObject);
         }
     }
 }

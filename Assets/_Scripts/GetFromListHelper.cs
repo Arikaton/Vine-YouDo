@@ -83,15 +83,12 @@ namespace _Scripts
             }
             else
             {
-                if (scrollViewContent.childCount == 0)
-                {
-                    Debug.Log("Data getting from local storage");
-                    OnGetData(data);
-                }
-                else
-                {
-                    loadingAnimation.SetActive(false);
-                }
+                Debug.Log("Data getting from local storage");
+
+                if (scrollViewContent.childCount != 0)
+                    DeleteChildren();
+                OnGetData(data);
+                loadingAnimation.SetActive(false);
             }
         }
 

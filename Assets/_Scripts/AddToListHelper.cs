@@ -12,6 +12,7 @@ public class AddToListHelper : MonoBehaviour
     [SerializeField] private Text regionCountryText = null;
     [SerializeField] private Back4appHelper back4AppHelper;
     [SerializeField] private string type;
+    [SerializeField] private InputField inputField;
     public Image color;
 
     private void OnEnable()
@@ -80,6 +81,7 @@ public class AddToListHelper : MonoBehaviour
     {
         downloadImage.SetActive(false);
         successText.SetActive(true);
+        inputField.text = "";
     }
 
     public void ErrorWhileAdding()
