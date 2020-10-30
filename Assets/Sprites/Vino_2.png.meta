@@ -1,7 +1,16 @@
 fileFormatVersion: 2
-guid: 724352f08f3020048997d02c4d272553
+guid: e15df11ba22ed9b41be8f6a05fdb5e29
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: -4486362628447920976
+    second: Vino_2_0
+  - first:
+      213: 2709694170090673981
+    second: Vino_2_1
+  - first:
+      213: -1484180547644069621
+    second: Vino_2_2
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -40,7 +49,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -99,17 +108,80 @@ TextureImporter:
     buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 51
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
-    overridden: 1
+    overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Vino_2_0
+      rect:
+        serializedVersion: 2
+        x: 594
+        y: 316
+        width: 166
+        height: 186
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0bc16cd85fc3db1c0800000000000000
+      internalID: -4486362628447920976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vino_2_1
+      rect:
+        serializedVersion: 2
+        x: 1196
+        y: 360
+        width: 160
+        height: 327
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d37933abd74ca9520800000000000000
+      internalID: 2709694170090673981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vino_2_2
+      rect:
+        serializedVersion: 2
+        x: 594
+        y: 502
+        width: 166
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b09612bc7a1276be0800000000000000
+      internalID: -1484180547644069621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []

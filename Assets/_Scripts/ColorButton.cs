@@ -10,19 +10,19 @@ public class ColorButton : MonoBehaviour
     [SerializeField] private LeanAnimation scaleIn;
     [SerializeField] private LeanAnimation scaleOut;
 
-    private bool isActive = false;
+    private bool _isActive;
 
     public void ChangeState()
     {
-        if (!isActive)
+        if (!_isActive)
         {
             scaleIn.BeginTransitions();
-            isActive = true;
+            _isActive = true;
         }
         else
         {
             scaleOut.BeginTransitions();
-            isActive = false;
+            _isActive = false;
         }
     }
 }
