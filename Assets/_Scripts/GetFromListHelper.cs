@@ -85,9 +85,8 @@ namespace _Scripts
             {
                 Debug.Log("Data getting from local storage");
 
-                if (scrollViewContent.childCount != 0)
-                    DeleteChildren();
-                OnGetData(data);
+                if (scrollViewContent.childCount == 0)
+                    OnGetData(data);
                 loadingAnimation.SetActive(false);
             }
         }

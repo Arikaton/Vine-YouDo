@@ -300,7 +300,7 @@ public class VineData
     public string Name;
     public string Cellar;
     public int Count;
-    public int Year;
+    public int Year { get; set; } = 0;
     public Dictionary<string, string> Image;
 
     public VineData(string color, string grape, string region, string country, string description, int count, int year, string cellar, string name)

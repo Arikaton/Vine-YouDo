@@ -47,8 +47,8 @@ public class VineView : MonoBehaviour
         nameText.text = _vineData.Name;
         descriptionText.text = _vineData.Description;
         countText.text = "Количество: " + _vineData.Count;
-        yearText.text = _vineData.Year.ToString();
-        regionText.text = _vineData.Region;
+        yearText.text = _vineData.Year == 0 ? "Non Vintage" : _vineData.Year.ToString();
+        regionText.text = _vineData.Region == "" ? "Регион не указан" : _vineData.Region;
         grapeText.text = _vineData.Grape;
         colorText.text = _vineData.Color;
     }

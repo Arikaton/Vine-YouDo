@@ -18,8 +18,8 @@ public class AddVineManager : MonoBehaviour
     public string grape;
     public string color;
     public string country;
-    public string region;
-    public int year;
+    public string region = "";
+    public int year = 0;
     public string description;
     public int count;
     public string cellar;
@@ -33,8 +33,6 @@ public class AddVineManager : MonoBehaviour
         if (!String.IsNullOrEmpty(grape) && 
             !String.IsNullOrEmpty(color) && 
             !String.IsNullOrEmpty(country) && 
-            !String.IsNullOrEmpty(region) &&
-            !String.IsNullOrEmpty(year.ToString()) &&
             !String.IsNullOrEmpty(name) &&
             !String.IsNullOrEmpty(count.ToString()))
         {
@@ -102,9 +100,9 @@ public class AddVineManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(value))
             return;
-        if (!int.TryParse(value, out year))
+        if (int.TryParse(value, out var _year))
         {
-            throw new Exception("Can't convert year to int. Given value is " + value);
+            year = _year;
         }
     }
     

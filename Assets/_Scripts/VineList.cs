@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class VineScroll : MonoBehaviour
+public class VineList : MonoBehaviour
 {
     [SerializeField] private Text text;
     [SerializeField] private Transform content;
@@ -13,7 +13,7 @@ public class VineScroll : MonoBehaviour
 
     public void Init(string year, List<VineData> vineDatas)
     {
-        text.text = year;
+        text.text = year == "0" ? "Non Vintage" : year;
         foreach (var vineData in vineDatas)
         {
             var vineCard = Instantiate(vineCardPrefab, content);

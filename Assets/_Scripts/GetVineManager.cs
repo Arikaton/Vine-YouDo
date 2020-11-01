@@ -14,7 +14,7 @@ public class GetVineManager : MonoBehaviour
     [SerializeField] private UIManager _uiManager;
     [SerializeField] private Back4appHelper _back4AppHelper;
     [SerializeField] private GameObject filterWindow;
-    [SerializeField] private VineScroll vineScollPrefab;
+    [SerializeField] private VineList vineScollPrefab;
     [SerializeField] Text filterWindowName;
     [SerializeField] private GameObject chipPrefab;
     [SerializeField] private Transform grapeContentWindow;
@@ -22,6 +22,8 @@ public class GetVineManager : MonoBehaviour
     [SerializeField] private Transform countryContentWindow;
     [SerializeField] private Transform regionContentWindow;
     [SerializeField] private Transform vineContentWindow;
+    [SerializeField] private GameObject filteredButton;
+    [SerializeField] private GameObject nonFilteredButton;
 
     public string cellar;
     public Dictionary<string, Color> grapes = new Dictionary<string, Color>();
@@ -115,6 +117,8 @@ public class GetVineManager : MonoBehaviour
                 UpdateChips(regions, regionContentWindow);
                 break;
         }
+        nonFilteredButton.SetActive(false);
+        filteredButton.SetActive(true);
     }
 
     public void DestroyChilds(Transform otherTransform)
@@ -148,6 +152,8 @@ public class GetVineManager : MonoBehaviour
         DestroyChilds(countryContentWindow);
         DestroyChilds(regionContentWindow);
         DestroyChilds(vineContentWindow);
+        nonFilteredButton.SetActive(true);
+        filteredButton.SetActive(false);
         OnReset?.Invoke();
     }
 
