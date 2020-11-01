@@ -33,43 +33,43 @@ namespace _Scripts
             GetDataResult data = null;
             if (type == Back4appHelper.GRAPES_CLASS)
             {
-                if (RepositoryManager._grapeNeedUpdate)
+                if (RepositoryManager.GrapeNeedUpdate)
                 {
                     needUpdate = true;
-                    RepositoryManager._grapeNeedUpdate = false;
+                    RepositoryManager.GrapeNeedUpdate = false;
                 }
                 else
-                    data = new GetDataResult(RepositoryManager.grapeData);
+                    data = new GetDataResult(RepositoryManager.GrapeData);
             }
             else if (type == Back4appHelper.COLORS_CLASS)
             {
-                if (RepositoryManager._colorNeedUpdate)
+                if (RepositoryManager.ColorNeedUpdate)
                 {
                     needUpdate = true;
-                    RepositoryManager._colorNeedUpdate = false;
+                    RepositoryManager.ColorNeedUpdate = false;
                 }
                 else
-                    data = new GetDataResult(RepositoryManager.colorData);
+                    data = new GetDataResult(RepositoryManager.ColorData);
             }
             else if (type == Back4appHelper.COUNTRIES_CLASS)
             {
-                if (RepositoryManager._countryNeedUpdate)
+                if (RepositoryManager.CountryNeedUpdate)
                 {
                     needUpdate = true;
-                    RepositoryManager._countryNeedUpdate = false;
+                    RepositoryManager.CountryNeedUpdate = false;
                 }
                 else
-                    data = new GetDataResult(RepositoryManager.countryData);
+                    data = new GetDataResult(RepositoryManager.CountryData);
             }
             else if (type == Back4appHelper.REGIONS_CLASS)
             {
-                if (RepositoryManager._regionNeedUpdate)
+                if (RepositoryManager.RegionNeedUpdate)
                 {
                     needUpdate = true;
-                    RepositoryManager._regionNeedUpdate = false;
+                    RepositoryManager.RegionNeedUpdate = false;
                 }
                 else
-                    data = new GetDataResult(RepositoryManager.regionData);
+                    data = new GetDataResult(RepositoryManager.RegionData);
             }
             else
             {
@@ -145,19 +145,19 @@ namespace _Scripts
         {
             if (type == Back4appHelper.GRAPES_CLASS)
             {
-                RepositoryManager.grapeData = result.resultsString;
+                RepositoryManager.GrapeData = result.resultsString;
             }
             else if (type == Back4appHelper.COLORS_CLASS)
             {
-                RepositoryManager.colorData = result.resultsString;
+                RepositoryManager.ColorData = result.resultsString;
             }
             else if (type == Back4appHelper.COUNTRIES_CLASS)
             {
-                RepositoryManager.countryData = result.resultsString;
+                RepositoryManager.CountryData = result.resultsString;
             }
             else if (type == Back4appHelper.REGIONS_CLASS)
             {
-                RepositoryManager.regionData = result.resultsString;
+                RepositoryManager.RegionData = result.resultsString;
             }
             else
             {

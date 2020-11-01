@@ -33,22 +33,22 @@ public class AddToListHelper : MonoBehaviour
         if (type == Back4appHelper.GRAPES_CLASS)
         {
             data.Add(Back4appHelper.GRAPES_FIELD, text.text);
-            RepositoryManager._grapeNeedUpdate = true;
+            RepositoryManager.GrapeNeedUpdate = true;
         } else if (type == Back4appHelper.COLORS_CLASS)
         {
             data.Add(Back4appHelper.COLOR_FIELD, text.text);
-            RepositoryManager._colorNeedUpdate = true;
+            RepositoryManager.ColorNeedUpdate = true;
         } else if (type == Back4appHelper.COUNTRIES_CLASS)
         {
             data.Add(Back4appHelper.COUNTRIES_FIELD, text.text);
-            RepositoryManager._countryNeedUpdate = true;
+            RepositoryManager.CountryNeedUpdate = true;
         } else if (type == Back4appHelper.REGIONS_CLASS)
         {
             data.Add(Back4appHelper.REGION_FIELD, text.text);
             if (regionCountryText != null)
             {
                 data.Add(Back4appHelper.COUNTRIES_FIELD, regionCountryText.text);
-                RepositoryManager._regionNeedUpdate = true;
+                RepositoryManager.RegionNeedUpdate = true;
             }
         }
         else

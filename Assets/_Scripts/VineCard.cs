@@ -1,5 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -16,7 +19,17 @@ public class VineCard : MonoBehaviour, IPointerClickHandler
     public void Init(VineData vineData)
     {
         _vineData = vineData;
-        StartCoroutine(DownloadImage());
+        var imagePath = PlayerPrefs.GetString(_vineData.Image["url"]);
+        if (!string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
+        {
+            _texture2D = NativeGallery.LoadImageAtPath(imagePath);
+            _image.texture = _texture2D;
+            downloadAnim.SetActive(false);
+        }
+        else
+        {
+            StartCoroutine(DownloadImage());
+        }
     }
 
     IEnumerator DownloadImage()
@@ -24,6 +37,11 @@ public class VineCard : MonoBehaviour, IPointerClickHandler
         var www = UnityWebRequestTexture.GetTexture(_vineData.Image["url"]);
         yield return www.SendWebRequest();
         _texture2D = DownloadHandlerTexture.GetContent(www);
+        var guid = Guid.NewGuid().ToString();
+        var path = Application.persistentDataPath + $"/{guid}.jpeg";
+        File.WriteAllBytes(path, _texture2D.EncodeToJPG());
+        PlayerPrefs.SetString(_vineData.Image["url"], path);
+
 #if UNITY_IOS
         _image.texture = _texture2D;
 #else

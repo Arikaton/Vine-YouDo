@@ -138,18 +138,6 @@ public class Back4appHelper : MonoBehaviour
         www.SetRequestHeader("Content-Type", "application/json");
     }
 
-    IEnumerator DownloadImageFromServerCor(string url)
-    {
-        var www = UnityWebRequestTexture.GetTexture(url);
-        //ww.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return www.SendWebRequest();
-
-        Texture2D tex = DownloadHandlerTexture.GetContent(www);
-        System.IO.File.WriteAllBytes( Application.dataPath + "/UnityImage.jpg", tex.EncodeToJPG());
-        print(Application.dataPath);
-    }
-
     IEnumerator UploadImageToServerCor(string path, VineData data)
     {
         var www = new UnityWebRequest("https://parseapi.back4app.com/files/UnityImage.jpg");
@@ -168,6 +156,7 @@ public class Back4appHelper : MonoBehaviour
                 {"name", imageData.name},
                 {"url", imageData.url}
             };
+            PlayerPrefs.SetString(imageData.url, path);
             StartCoroutine(AddDataCor(Back4appHelper.VINE_CLASS, JsonConvert.SerializeObject(data)));
         }
         else
@@ -189,8 +178,9 @@ public class Back4appHelper : MonoBehaviour
         SetHeaders(www);
         www.downloadHandler = new DownloadHandlerBuffer();
         yield return www.SendWebRequest();
-        
+        RepositoryManager.UpdateVineInfo(cellar, false);
         var vineList = JObject.Parse(www.downloadHandler.text)["results"].ToString();
+        RepositoryManager.UpdateVineData(cellar, vineList);
         onGetVineList(JsonConvert.DeserializeObject<List<VineData>>(vineList));
     }
 }

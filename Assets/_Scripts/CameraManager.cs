@@ -28,5 +28,4 @@ public class CameraManager : MonoBehaviour
     {
         NativeGallery.GetImageFromGallery(OnTakePicture);
     }
-
 }

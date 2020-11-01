@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class AddVineManager : MonoBehaviour
 {
     public static AddVineManager Main;
+    public Action OnReset;
 
     [SerializeField] private GameObject rootWindow;
     [SerializeField] private Back4appHelper _back4AppHelper;
@@ -14,28 +14,84 @@ public class AddVineManager : MonoBehaviour
     [SerializeField] private GameObject colorObject;
     [SerializeField] private GameObject countryObject;
     [SerializeField] private GameObject regionObject;
+    [SerializeField] private GameObject grapeButtonPrefab;
+    [SerializeField] private Transform grapeContentParent;
     
     public string grape;
     public string color;
     public string country;
     public string region = "";
     public int year = 0;
-    public string description;
-    public int count;
+    public string description = "";
+    public int count = 1;
     public string cellar;
     public string name;
 
     private Texture2D _image;
     private string _imagePath;
+
+    public void Reset()
+    {
+        grape = "";
+        color = "";
+        count = 1;
+        region = "";
+        year = 0;
+        description = "";
+        name = "";
+        OnReset?.Invoke();
+    }
+
+    public void GrapeChoosen(bool _isChoosen, string name)
+    {
+        if (_isChoosen)
+        {
+            if (string.IsNullOrEmpty(grape))
+            {
+                grape += name;
+            }
+            else
+            {
+                grape += $",{name}";
+            }
+        }
+        else
+        {
+            if (grape.Contains(name))
+            {
+                print("Grape contains "+name);
+                if (grape.IndexOf(name, StringComparison.Ordinal) == 0)
+                {
+                    print("try remove first grape");
+                    if (grape.Length != name.Length)
+                    {
+                        print("Grape not only one");
+                        grape = grape.Replace($"{name},", "");
+                    }
+                    else
+                    {
+                        print("Grape is only one");
+                        grape = "";
+                    }
+                }
+                else
+                {
+                    print("try remove middle or last grape");
+                    grape = grape.Replace($",{name}", "");
+                }
+            }
+        }
+    }
     
     public void Save()
     {
         if (!String.IsNullOrEmpty(grape) && 
             !String.IsNullOrEmpty(color) && 
             !String.IsNullOrEmpty(country) && 
-            !String.IsNullOrEmpty(name) &&
-            !String.IsNullOrEmpty(count.ToString()))
+            !String.IsNullOrEmpty(name))
         {
+            RepositoryManager.UpdateVineInfo(cellar, true);
+            
             var vineData = new VineData(
                 color,
                 grape,
@@ -46,6 +102,7 @@ public class AddVineManager : MonoBehaviour
                 year,
                 cellar, 
                 name);
+
             _back4AppHelper.UploadImage(_imagePath, vineData);
             UIManager.Main.ShowWindow(rootWindow);
         }
@@ -72,7 +129,15 @@ public class AddVineManager : MonoBehaviour
         if (!string.IsNullOrEmpty(grape))
         {
             grapeObject.SetActive(true);
-            grapeObject.GetComponentInChildren<Text>().text = grape;
+            foreach (Transform grapeChild in grapeContentParent)
+            {    
+                Destroy(grapeChild.gameObject);
+            }
+            foreach (var grapeName in grape.Split(','))
+            {
+                var grapeButtonGo = Instantiate(grapeButtonPrefab, grapeContentParent);
+                grapeButtonGo.GetComponentInChildren<Text>().text = grapeName;
+            }
         }
         if (!string.IsNullOrEmpty(color))
         {

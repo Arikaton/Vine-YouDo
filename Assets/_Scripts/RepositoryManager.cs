@@ -1,90 +1,91 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using _Scripts;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class RepositoryManager : MonoBehaviour
 {
-    public static bool _grapeNeedUpdate = true;
-    public static bool _colorNeedUpdate = true;
-    public static bool _countryNeedUpdate = true;
-    public static bool _regionNeedUpdate = true;
+    public static bool GrapeNeedUpdate = true;
+    public static bool ColorNeedUpdate = true;
+    public static bool CountryNeedUpdate = true;
+    public static bool RegionNeedUpdate = true;
+    public static bool MoscowVineNeedUpdate = true;
+    public static bool GreenVineNeedUpdate = true;
+    public static bool NizniyVineNeedUpdate = true;
 
-    public static string grapeData;
-    public static string colorData;
-    public static string countryData;
-    public static string regionData;
+    public static string GrapeData;
+    public static string ColorData;
+    public static string CountryData;
+    public static string RegionData;
+    public static string MoscowVineData;
+    public static string GreenVineData;
+    public static string NizniyVineData;
 
-    /*public void GetGrape()
+    public static bool GetVineInfo(string cellar)
     {
-        if (_grapeNeedUpdate)
-            _back4AppHelper.GetData(Back4appHelper.GRAPES_CLASS, OnGetGrape);
-    }
-
-    private void OnGetGrape(GetDataResult grapeDataResult)
-    {
-        List<CommonResult> commonResults = grapeDataResult.Results.ConvertAll<CommonResult>(result =>
-            {
-                bool isFavorite = (bool?) result["IsFavorite"] == true;
-                return new CommonResult(
-                    result["Grape"].ToString(),
-                    result["HEX"].ToString(),
-                    isFavorite,
-                    result["objectId"].ToString()
-                );
-            }
-            
-        );
-        GetFromListHelper.Current.GenerateList(commonResults);
-        _grapeNeedUpdate = false;
-    }
-    
-    public void GetColor()
-    {
-        if (_colorNeedUpdate)
+        switch (cellar)
         {
-            _back4AppHelper.GetData(Back4appHelper.COLORS_CLASS, OnGetColor);
+            case "Москва":
+                return MoscowVineNeedUpdate;
+            case "Зеленый город":
+                return GreenVineNeedUpdate;
+            case "Нижний":
+                return NizniyVineNeedUpdate;
+            default:
+                throw new Exception("Wrong cellar");
         }
     }
-
-    private void OnGetColor(GetDataResult getDataResult)
+    
+    public static void UpdateVineInfo(string cellar, bool needUpdate)
     {
-        List<CommonResult> commonResults = getDataResult.Results.ConvertAll<CommonResult>(result =>
-            {
-                bool isFavorite = (bool?) result["IsFavorite"] == true;
-                return new CommonResult(
-                    result["Color"].ToString(),
-                    result["HEX"].ToString(),
-                    isFavorite,
-                    result["objectId"].ToString()
-                );
-            }
-        );
-        GetFromListHelper.Current.GenerateList(commonResults);
-        _colorNeedUpdate = false;
+        switch (cellar)
+        {
+            case "Москва":
+                MoscowVineNeedUpdate = needUpdate;
+                break;
+            case "Зеленый город":
+                GreenVineNeedUpdate = needUpdate;
+                break;
+            case "Нижний":
+                NizniyVineNeedUpdate = needUpdate;
+                break;
+            default:
+                throw new Exception("Wrong cellar");
+        }
     }
-
-    public void GetCountries()
+    public static void UpdateVineData(string cellar, string data)
     {
-        if (_countryNeedUpdate)
-            _back4AppHelper.GetData(Back4appHelper.COUNTRIES_CLASS, OnGetCountries);
+        switch (cellar)
+        {
+            case "Москва":
+                MoscowVineData = data;
+                break;
+            case "Зеленый город":
+                GreenVineData = data;
+                break;
+            case "Нижний":
+                NizniyVineData = data;
+                break;
+            default:
+                throw new Exception("Wrong cellar");
+        }
     }
     
-    private void OnGetCountries(GetDataResult getDataResult)
+    public static List<VineData> GetVineData(string cellar)
     {
-        List<CommonResult> commonResults = getDataResult.Results.ConvertAll<CommonResult>(result =>
-            {
-                bool isFavorite = (bool?) result["IsFavorite"] == true;
-                return new CommonResult(
-                    result["Country"].ToString(),
-                    result["HEX"].ToString(),
-                    isFavorite,
-                    result["objectId"].ToString()
-                );
-            }
-        );
-        GetFromListHelper.Current.GenerateList(commonResults);
-        _countryNeedUpdate = false;
-    }*/
+        switch (cellar)
+        {
+            case "Москва":
+                return JsonConvert.DeserializeObject<List<VineData>>(MoscowVineData);
+            case "Зеленый город":
+                return JsonConvert.DeserializeObject<List<VineData>>(GreenVineData);
+            case "Нижний":
+                return JsonConvert.DeserializeObject<List<VineData>>(NizniyVineData);
+            default:
+                throw new Exception("Wrong cellar");
+        }
+    }
 }

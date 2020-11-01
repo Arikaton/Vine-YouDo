@@ -41,7 +41,14 @@ public class GetVineManager : MonoBehaviour
     public void GetVineList(bool useFilter)
     {
         _useFilter = useFilter;
-        _back4AppHelper.GetVine(cellar, OnGetVine);
+        if (RepositoryManager.GetVineInfo(cellar))
+        {
+            _back4AppHelper.GetVine(cellar, OnGetVine);
+        }
+        else
+        {
+            OnGetVine(RepositoryManager.GetVineData(cellar));
+        }
     }
 
     void OnGetVine(List<VineData> vines)
@@ -53,8 +60,18 @@ public class GetVineManager : MonoBehaviour
         {
             orderedVine = orderedVine.Where(x =>
             {
-                if (grapes.Count > 0 && !grapes.ContainsKey(x.Grape))
-                    return false;
+                if (grapes.Count > 0)
+                {
+                    bool helpFilter = false;
+                    foreach (var grapeFilter in x.Grape.Split(','))
+                    {
+                        if (grapes.ContainsKey(grapeFilter))
+                            helpFilter = true;
+                    }
+
+                    if (!helpFilter)
+                        return false;
+                }
                 if (colors.Count > 0 && !colors.ContainsKey(x.Color))
                     return false;
                 if (countries.Count > 0 && !countries.ContainsKey(x.Country))
