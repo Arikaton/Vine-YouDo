@@ -16,6 +16,11 @@ public class AddVineManager : MonoBehaviour
     [SerializeField] private GameObject regionObject;
     [SerializeField] private GameObject grapeButtonPrefab;
     [SerializeField] private Transform grapeContentParent;
+
+    [SerializeField] InputField nameInputField;
+    [SerializeField] InputField yearInputField;
+    [SerializeField] InputField countInputField;
+    [SerializeField] InputField descriptionInputField;
     
     public string grape;
     public string color;
@@ -32,10 +37,23 @@ public class AddVineManager : MonoBehaviour
 
     public void Reset()
     {
+        nameInputField.text = "";
+        yearInputField.text = "";
+        countInputField.text = "";
+        descriptionInputField.text = "";
         grape = "";
+        foreach (Transform child in grapeContentParent)
+        {
+            Destroy(child.gameObject);
+        }
+        grapeObject.SetActive(false);
         color = "";
+        colorObject.SetActive(false);
         count = 1;
         region = "";
+        regionObject.SetActive(false);
+        country = "";
+        countryObject.SetActive(false);
         year = 0;
         description = "";
         name = "";

@@ -12,6 +12,7 @@ public class FilterGridController : MonoBehaviour
     {
         if (scrollRect.rect.height < 120)
         {
+            Debug.Log(scrollRect.rect.height);
             GetComponent<GridLayoutGroup>().constraintCount = 1;
         }
     }
