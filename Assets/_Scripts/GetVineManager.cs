@@ -104,6 +104,10 @@ public class GetVineManager : MonoBehaviour
                 lastVineScroll.Init(year.ToString(), vineHandler);
             }
         }
+        //this lines fix bug when only one vine list exist
+        var handler = new GameObject();
+        handler.AddComponent<RectTransform>();
+        handler.transform.SetParent(vineContentWindow);
     }
 
     public void ShowFilterWindow(string cellarName)

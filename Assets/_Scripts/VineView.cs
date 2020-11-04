@@ -52,7 +52,7 @@ public class VineView : MonoBehaviour
         countText.text = "Количество: " + _vineData.Count;
         yearText.text = _vineData.Year == 0 ? "Non Vintage" : _vineData.Year.ToString();
         regionText.text = _vineData.Region == "" ? "Регион не указан" : _vineData.Region;
-        grapeText.text = _vineData.Grape;
+        grapeText.text = _vineData.Grape.Replace(',','\n');
         colorText.text = _vineData.Color;
         countryText.text = _vineData.Country;
     }
