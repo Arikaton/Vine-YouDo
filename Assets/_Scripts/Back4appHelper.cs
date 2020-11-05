@@ -179,6 +179,7 @@ public class Back4appHelper : MonoBehaviour
         www.downloadHandler = new DownloadHandlerBuffer();
         yield return www.SendWebRequest();
         RepositoryManager.UpdateVineInfo(cellar, false);
+        Debug.Log(www.downloadHandler.text);
         var vineList = JObject.Parse(www.downloadHandler.text)["results"].ToString();
         RepositoryManager.UpdateVineData(cellar, vineList);
         onGetVineList(JsonConvert.DeserializeObject<List<VineData>>(vineList));

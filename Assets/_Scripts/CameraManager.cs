@@ -12,7 +12,7 @@ public class CameraManager : MonoBehaviour
     
     public void TakePhoto()
     {
-        NativeCamera.TakePicture(OnTakePicture, 1000);
+        NativeCamera.TakePicture(OnTakePicture, 512);
     }
 
     private void OnTakePicture(string path)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
@@ -93,7 +94,10 @@ public class VineView : MonoBehaviour
         if (_vineData.Count == _count)
         {
             _back4AppHelper.DeleteObject(_vineData.objectId, Back4appHelper.VINE_CLASS);
+            var path = PlayerPrefs.GetString(_vineData.Image["url"]);
             Destroy(_cardObj);
+            File.Delete(path);
+            PlayerPrefs.DeleteKey(_vineData.Image["url"]);
         }
         else
         {
@@ -108,9 +112,14 @@ public class VineView : MonoBehaviour
         UIManager.Main.ShowWindow(whichOneWindow);
     }
 
-    
 
-    private void ResetCount() => _count = 1;
+
+    private void ResetCount()
+    {
+        _count = 1;
+        UpdateCountDrinkText();
+    } 
+
 
     private void UpdateCountDrinkText() => countDrinkText.text = _count.ToString();
 

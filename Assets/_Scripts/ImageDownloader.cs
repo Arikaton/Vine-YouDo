@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class ImageDownloader : MonoBehaviour
 {
     public static ImageDownloader main;
-
-    private Queue<VineCard> cardQueue = new Queue<VineCard>();
 
     private bool isDownloading = false;
 
@@ -18,44 +17,29 @@ public class ImageDownloader : MonoBehaviour
         main = this;
     }
 
-    public void DownloadImage(VineCard vineCard)
+    public IEnumerator DownloadImageCor(List<VineData> vineList, Text infoText)
     {
-        cardQueue.Enqueue(vineCard);
-        if (!isDownloading)
-            StartCoroutine(DownloadImageCor());
-    }
-
-    private IEnumerator DownloadImageCor()
-    {
-        isDownloading = true;
-        if (cardQueue.Count == 0)
-            yield return null;
-        var vineCard = cardQueue.Dequeue();
-        var www = UnityWebRequestTexture.GetTexture(vineCard.VineData.Image["url"]);
-        yield return www.SendWebRequest();
-        if (vineCard == null)
+        var uploadImageCount = 0;
+        foreach (var vineData in vineList)
         {
-            cardQueue = new Queue<VineCard>();
-            isDownloading = false;
-            yield return null;
-            StopAllCoroutines();
-        }
-        else
-        {
-            var texture2D = DownloadHandlerTexture.GetContent(www);
+            if (!PlayerPrefs.HasKey(vineData.Image["url"]) && !File.Exists(vineData.Image["url"]))
+            {
+                var www = UnityWebRequestTexture.GetTexture(vineData.Image["url"]);
+                yield return www.SendWebRequest();
+                var texture2D = DownloadHandlerTexture.GetContent(www);
+                www.Dispose();
 #if !UNITY_IOS
-            texture2D = RotateTexture(texture2D, true);
+                texture2D = RotateTexture(texture2D, true);
 #endif
-            var guid = Guid.NewGuid().ToString();
-            var path = Application.persistentDataPath + $"/{guid}.jpeg";
-            File.WriteAllBytes(path, texture2D.EncodeToJPG());
-            PlayerPrefs.SetString(vineCard.VineData.Image["url"], path);
-            if (vineCard.gameObject != null)
-                vineCard.SetImage(texture2D);
-            if (cardQueue.Count == 0)
-                isDownloading = false;
-            else
-                StartCoroutine(DownloadImageCor());
+                var guid = Guid.NewGuid().ToString();
+                var path = Application.persistentDataPath + $"/{guid}.jpeg";
+                TextureScale.Scale(texture2D, 512, 512);
+                File.WriteAllBytes(path, texture2D.EncodeToJPG());
+                PlayerPrefs.SetString(vineData.Image["url"], path);
+                Resources.UnloadUnusedAssets();
+            }
+            uploadImageCount++;
+            infoText.text = $"Загружаем изображения {uploadImageCount}/{vineList.Count}";
         }
     }
     

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using UnityEngine;
@@ -24,6 +25,8 @@ public class GetVineManager : MonoBehaviour
     [SerializeField] private Transform vineContentWindow;
     [SerializeField] private GameObject filteredButton;
     [SerializeField] private GameObject nonFilteredButton;
+    [SerializeField] private GameObject downloadAnim;
+    [SerializeField] private Text infoText;
 
     public string cellar;
     public Dictionary<string, Color> grapes = new Dictionary<string, Color>();
@@ -40,6 +43,7 @@ public class GetVineManager : MonoBehaviour
 
     public void GetVineList(bool useFilter)
     {
+        infoText.text = "Загружаем список вин...";
         _useFilter = useFilter;
         if (RepositoryManager.GetVineInfo(cellar))
         {
@@ -54,7 +58,10 @@ public class GetVineManager : MonoBehaviour
     void OnGetVine(List<VineData> vines)
     {
         if (vines.Count == 0)
+        {
+            infoText.text = "Не могу найти ни одного вина";
             return;
+        }
         var orderedVine = vines.OrderBy(x => x.Year).ToList();
         if (_useFilter)
         {
@@ -81,11 +88,40 @@ public class GetVineManager : MonoBehaviour
                 return true;
             }).ToList();
         }
-        int year = orderedVine[0].Year;
-        List<VineData> vineHandler = new List<VineData>();
-        for (int i = 0; i < orderedVine.Count; i++)
+
+        StartCoroutine(DownloadImagesThenShow(orderedVine));
+    }
+
+    IEnumerator DownloadImagesThenShow(List<VineData> vineList)
+    {
+        var vineCardWithoutImage = new List<VineData>(vineList.Count / 2);
+        foreach (var vineData in vineList)
         {
-            var vineData = orderedVine[i];
+            if (!PlayerPrefs.HasKey(vineData.Image["url"]))
+            {
+                vineCardWithoutImage.Add(vineData);
+            }
+            else
+            {
+                if (!File.Exists(PlayerPrefs.GetString(vineData.Image["url"])))
+                {
+                    vineCardWithoutImage.Add(vineData);
+                }
+            }
+        }
+        infoText.text = $"Загружаем изображения 0/{vineCardWithoutImage.Count}";
+
+
+        if (vineCardWithoutImage.Count != 0)
+            yield return StartCoroutine(ImageDownloader.main.DownloadImageCor(vineCardWithoutImage, infoText));
+        else
+            yield return null;
+        
+        int year = vineList[0].Year;
+        List<VineData> vineHandler = new List<VineData>();
+        for (int i = 0; i < vineList.Count; i++)
+        {
+            var vineData = vineList[i];
             if (vineData.Year != year)
             {
                 var vineScroll = Instantiate(vineScollPrefab, vineContentWindow);
@@ -98,7 +134,7 @@ public class GetVineManager : MonoBehaviour
             {
                 vineHandler.Add(vineData);
             }
-            if (i == orderedVine.Count - 1)
+            if (i == vineList.Count - 1)
             {
                 var lastVineScroll = Instantiate(vineScollPrefab, vineContentWindow);
                 lastVineScroll.Init(year.ToString(), vineHandler);
@@ -108,6 +144,7 @@ public class GetVineManager : MonoBehaviour
         var handler = new GameObject();
         handler.AddComponent<RectTransform>();
         handler.transform.SetParent(vineContentWindow);
+        downloadAnim.SetActive(false);
     }
 
     public void ShowFilterWindow(string cellarName)
@@ -176,6 +213,7 @@ public class GetVineManager : MonoBehaviour
         nonFilteredButton.SetActive(true);
         filteredButton.SetActive(false);
         OnReset?.Invoke();
+        downloadAnim.SetActive(true);
     }
 
     public void AddToFilter(string type, bool isAddedToFilter, Color color, string text)
