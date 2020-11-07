@@ -28,19 +28,25 @@ public class ImageDownloader : MonoBehaviour
                 yield return www.SendWebRequest();
                 var texture2D = DownloadHandlerTexture.GetContent(www);
                 www.Dispose();
-#if !UNITY_IOS
-                texture2D = RotateTexture(texture2D, true);
-#endif
-                var guid = Guid.NewGuid().ToString();
-                var path = Application.persistentDataPath + $"/{guid}.jpeg";
-                TextureScale.Scale(texture2D, 512, 512);
-                File.WriteAllBytes(path, texture2D.EncodeToJPG());
-                PlayerPrefs.SetString(vineData.Image["url"], path);
-                Resources.UnloadUnusedAssets();
+                SaveImageLocal(texture2D, vineData.Image["url"]);
             }
             uploadImageCount++;
             infoText.text = $"Загружаем изображения {uploadImageCount}/{vineList.Count}";
         }
+    }
+
+    public static void SaveImageLocal(Texture2D texture2D, string prefKey, bool rotate = true)
+    {
+#if !UNITY_IOS
+        if (rotate)
+            texture2D = RotateTexture(texture2D, true);
+#endif
+        var guid = Guid.NewGuid().ToString();
+        var path = Application.persistentDataPath + $"/{guid}.jpeg";
+        TextureScale.Scale(texture2D, 512, 512);
+        File.WriteAllBytes(path, texture2D.EncodeToJPG());
+        PlayerPrefs.SetString(prefKey, path);
+        Resources.UnloadUnusedAssets();
     }
     
     public static Texture2D LoadTexture2D(string filePath) {

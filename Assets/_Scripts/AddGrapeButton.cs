@@ -19,6 +19,7 @@ public class AddGrapeButton : MonoBehaviour, IInitable
         image.color = color;
         text.text = name;
         _objectId = objectId;
+        AddVineManager.Main.OnReset += Reset;
     }
 
     public void Choose()
@@ -35,7 +36,12 @@ public class AddGrapeButton : MonoBehaviour, IInitable
         }
         AddVineManager.Main.GrapeChoosen(_isChoosen, text.text);
     }
-    
+
+    private void OnDestroy()
+    {
+        AddVineManager.Main.OnReset -= Reset;
+    }
+
     public void Reset()
     {
         chooseImage.SetActive(false);

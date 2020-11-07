@@ -156,7 +156,8 @@ public class Back4appHelper : MonoBehaviour
                 {"name", imageData.name},
                 {"url", imageData.url}
             };
-            PlayerPrefs.SetString(imageData.url, path);
+            var texture = ImageDownloader.LoadTexture2D(path);
+            ImageDownloader.SaveImageLocal(texture, imageData.url, false);
             StartCoroutine(AddDataCor(Back4appHelper.VINE_CLASS, JsonConvert.SerializeObject(data)));
         }
         else

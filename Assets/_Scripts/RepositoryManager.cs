@@ -15,7 +15,7 @@ public class RepositoryManager : MonoBehaviour
     public static bool MoscowVineNeedUpdate = true;
     public static bool GreenVineNeedUpdate = true;
     public static bool NizniyVineNeedUpdate = true;
-
+    
     public static string GrapeData;
     public static string ColorData;
     public static string CountryData;
