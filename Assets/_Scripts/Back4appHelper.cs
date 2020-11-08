@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEditor;
 using UnityEngine.UI;
 
 public class Back4appHelper : MonoBehaviour
@@ -27,6 +28,8 @@ public class Back4appHelper : MonoBehaviour
     public delegate void OnEndAddDataCallback(AddDataResult data);
     public delegate void OnEndGetDataCallback(GetDataResult dataResult);
 
+    public delegate void VineExistCallback(VineData vineData);
+
     public delegate void OnGetVineList(List<VineData> vines);
 
     [SerializeField] private string parseApplicationId;
@@ -35,6 +38,11 @@ public class Back4appHelper : MonoBehaviour
     public void AddData(string type, Dictionary<string, object> data, OnEndAddDataCallback callback)
     {
         StartCoroutine(AddDataCor(type, data, callback));
+    }
+
+    public void AddData(string type, string data)
+    {
+        StartCoroutine(AddDataCor(type, data));
     }
 
     private IEnumerator AddDataCor(string type, Dictionary<string, object> data, OnEndAddDataCallback callback)
@@ -138,6 +146,43 @@ public class Back4appHelper : MonoBehaviour
         www.SetRequestHeader("Content-Type", "application/json");
     }
 
+    public void SameVineExist(string cellar, VineData vineData, VineExistCallback vineExistCallback)
+    {
+        StartCoroutine(SameVineExistCor(cellar, vineData, vineExistCallback));
+    }
+
+    private IEnumerator SameVineExistCor(string cellar, VineData vineData, VineExistCallback vineExistCallback)
+    {
+        var queryData = new Dictionary<string, object>()
+        {
+            {"Grape", vineData.Grape},
+            {"Color", vineData.Color},
+            {"Region", vineData.Region},
+            {"Country", vineData.Country},
+            {"Cellar", cellar}
+        };
+        var query = "where=" + JsonConvert.SerializeObject(queryData);
+        var www = new UnityWebRequest("https://parseapi.back4app.com/classes/Vine?" + query);
+        SetHeaders(www);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        yield return www.SendWebRequest();
+        if (!www.isHttpError)
+        {
+            var vineListString = JObject.Parse(www.downloadHandler.text)["results"].ToString();
+            var vineList = JsonConvert.DeserializeObject<List<VineData>>(vineListString);
+            VineData newVineData = null;
+            if (vineList.Count > 0)
+            {
+                newVineData = vineList[0];
+            }
+            vineExistCallback(newVineData);
+        }
+        else
+        {
+            Debug.Log("Problem! " + www.error);
+        }
+    }
+
     IEnumerator UploadImageToServerCor(string path, VineData data)
     {
         var www = new UnityWebRequest("https://parseapi.back4app.com/files/UnityImage.jpg");
@@ -180,7 +225,6 @@ public class Back4appHelper : MonoBehaviour
         www.downloadHandler = new DownloadHandlerBuffer();
         yield return www.SendWebRequest();
         RepositoryManager.UpdateVineInfo(cellar, false);
-        Debug.Log(www.downloadHandler.text);
         var vineList = JObject.Parse(www.downloadHandler.text)["results"].ToString();
         RepositoryManager.UpdateVineData(cellar, vineList);
         onGetVineList(JsonConvert.DeserializeObject<List<VineData>>(vineList));
@@ -306,6 +350,22 @@ public class VineData
         Year = year;
         Cellar = cellar;
         Name = name;
+    }
+
+    public VineData Copy()
+    {
+        VineData copy = new VineData(
+            Color,
+            Grape,
+            Region,
+            Country,
+            Description,
+            Count,
+            Year,
+            Cellar,
+            Name);
+        copy.Image = Image;
+        return copy;
     }
 
     public override string ToString()

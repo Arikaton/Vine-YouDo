@@ -22,13 +22,17 @@ public class VineView : MonoBehaviour
     [SerializeField] private Text grapeText;
     [SerializeField] private Text colorText;
     [SerializeField] private Text countDrinkText;
+    [SerializeField] private Text countCellarText;
     
     private VineData _vineData;
     private Texture2D _texture2D;
     private GameObject _cardObj;
     private string currentCellar;
 
+    private bool _isDownloading = false;
+
     private int _count = 1;
+    private int _cellarCount = -1;
 
     private void Awake()
     {
@@ -60,14 +64,66 @@ public class VineView : MonoBehaviour
 
     public void ChangePlace(string cellar)
     {
-        Destroy(_cardObj);
+        if (_isDownloading) return;
         UpdateCellarInfo(currentCellar);
         UpdateCellarInfo(cellar);
-        _back4AppHelper.UpdateData(
-            _vineData.objectId, 
-            Back4appHelper.VINE_CLASS, 
-            JsonConvert.SerializeObject(new Dictionary<string, string>(){{"Cellar", cellar}}));
-        UIManager.Main.ShowWindow(whichOneWindow);
+        _isDownloading = true;
+        _back4AppHelper.SameVineExist(cellar, _vineData, data =>
+        {
+            if (data != null)
+            {
+                if (_cellarCount == -1 || _cellarCount == _vineData.Count)
+                {
+                    var countData = JsonConvert.SerializeObject(new Dictionary<string, int>()
+                    {
+                        {"Count", data.Count + _vineData.Count}
+                    });
+                    _back4AppHelper.UpdateData(data.objectId, Back4appHelper.VINE_CLASS, countData);
+                    _back4AppHelper.DeleteObject(_vineData.objectId, Back4appHelper.VINE_CLASS);
+                    Destroy(_cardObj);
+                }
+                else
+                {
+                    var countHandler = new Dictionary<string, int>(1)
+                    {
+                        {"Count", data.Count + _cellarCount}
+                    };
+                    _vineData.Count -= _cellarCount;
+                    _back4AppHelper.UpdateData(data.objectId, Back4appHelper.VINE_CLASS, JsonConvert.SerializeObject(countHandler));
+                    countHandler["Count"] = _vineData.Count;
+                    _back4AppHelper.UpdateData(_vineData.objectId, Back4appHelper.VINE_CLASS, JsonConvert.SerializeObject(countHandler));
+                }
+            }
+            else
+            {
+                if (_cellarCount == -1 || _cellarCount == _vineData.Count)
+                {
+                    _back4AppHelper.UpdateData(
+                        _vineData.objectId, 
+                        Back4appHelper.VINE_CLASS, 
+                        JsonConvert.SerializeObject(new Dictionary<string, string>(){{"Cellar", cellar}}));
+                    Destroy(_cardObj);
+                }
+                else
+                {
+                    var countHandler = new Dictionary<string, int>(1)
+                    {
+                        {"Count", _vineData.Count - _cellarCount}
+                    };
+                    _back4AppHelper.UpdateData(_vineData.objectId, Back4appHelper.VINE_CLASS, JsonConvert.SerializeObject(countHandler));
+                    var newVineData = _vineData.Copy();
+                    _vineData.Count -= _cellarCount;
+                    newVineData.Count = _cellarCount;
+                    newVineData.objectId = "";
+                    newVineData.Cellar = cellar;
+                    _back4AppHelper.AddData(Back4appHelper.VINE_CLASS, JsonConvert.SerializeObject(newVineData));
+                }
+            }
+
+            _isDownloading = false;
+            UIManager.Main.ShowWindow(whichOneWindow);
+        });
+        
     }
 
     private void UpdateCellarInfo(string cellar)
@@ -112,14 +168,13 @@ public class VineView : MonoBehaviour
         UIManager.Main.ShowWindow(whichOneWindow);
     }
 
-
-
     private void ResetCount()
     {
         _count = 1;
+        _cellarCount = -1;
+        UpdateCellarCountText();
         UpdateCountDrinkText();
     } 
-
 
     private void UpdateCountDrinkText() => countDrinkText.text = _count.ToString();
 
@@ -139,5 +194,35 @@ public class VineView : MonoBehaviour
             _count--;
             UpdateCountDrinkText();
         }
+    }
+
+    private void UpdateCellarCountText() => countCellarText.text = _cellarCount == -1 ? "Все" : _cellarCount.ToString();
+
+    public void AddCellarCount()
+    {
+        if (_cellarCount == -1)
+        {
+            _cellarCount = 1;
+        }
+        else
+        {
+            if (_cellarCount < _vineData.Count)
+                _cellarCount++;
+        }
+        UpdateCellarCountText();
+    }
+
+    public void SubtractCellarCount()
+    {
+        if (_cellarCount <= 1)
+        {
+            _cellarCount = -1;
+        }
+        else
+        {
+            _cellarCount--;
+        }
+
+        UpdateCellarCountText();
     }
 }
