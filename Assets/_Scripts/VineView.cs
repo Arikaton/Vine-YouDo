@@ -28,6 +28,7 @@ public class VineView : MonoBehaviour
     private Texture2D _texture2D;
     private GameObject _cardObj;
     private string currentCellar;
+    private VineCard _vineCard;
 
     private bool _isDownloading = false;
 
@@ -39,14 +40,24 @@ public class VineView : MonoBehaviour
         main = this;
     }
 
-    public void SetData(VineData data, Texture2D texture2D, GameObject cardObj)
+    public void SetData(VineData data, Texture2D texture2D, GameObject cardObj, VineCard vineCard)
     {
         currentCellar = data.Cellar;
+        _vineCard = vineCard;
         _vineData = data;
         _texture2D = texture2D;
         _cardObj = cardObj;
         ResetCount();
         ShowData();
+    }
+
+    public void RotateImage()
+    {
+        var rotatedTexture = ImageDownloader.RotateTexture(_texture2D, true);
+        _texture2D = rotatedTexture;
+        ImageDownloader.SaveImageLocal(rotatedTexture, _vineData.Image["url"]);
+        image.texture = rotatedTexture;
+        _vineCard.Texture = rotatedTexture;
     }
 
     private void ShowData()

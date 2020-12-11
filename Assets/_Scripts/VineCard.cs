@@ -14,6 +14,15 @@ public class VineCard : MonoBehaviour, IPointerClickHandler
     [SerializeField] private GameObject downloadAnim;
     private string imagePath;
 
+    public Texture2D Texture
+    {
+        set
+        {
+            _image.texture = value;
+            _texture2D = value;
+        }
+    }
+
     private bool _isInited = false;
 
     public VineData VineData { get; private set; }
@@ -62,7 +71,7 @@ public class VineCard : MonoBehaviour, IPointerClickHandler
 
     public void ShowCardView()
     {
-        VineView.main.SetData(VineData, _texture2D, gameObject);
+        VineView.main.SetData(VineData, _texture2D, gameObject, this);
         UIManager.Main.ShowVineView();
     }
 

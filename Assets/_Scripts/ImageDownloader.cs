@@ -40,7 +40,7 @@ public class ImageDownloader : MonoBehaviour
         var path = GetPathFromImageUrl(prefKey);
         TextureScale.Scale(texture2D, 512, 512);
         File.WriteAllBytes(path, texture2D.EncodeToJPG());
-        PlayerPrefs.SetString(prefKey, path);
+        //PlayerPrefs.SetString(prefKey, path);
         Resources.UnloadUnusedAssets();
     }
 
@@ -49,9 +49,9 @@ public class ImageDownloader : MonoBehaviour
         return Application.persistentDataPath +  $"/{url.Replace("https://parsefiles.back4app.com/", "").Split('/')[1]}";
     }
     
-    public static Texture2D LoadTexture2D(string filePath) {
- 
-        Texture2D tex = null;
+    public static Texture2D LoadTexture2D(string filePath)
+    {
+        Texture2D tex;
         byte[] fileData;
  
         if (File.Exists(filePath))     {
@@ -65,8 +65,8 @@ public class ImageDownloader : MonoBehaviour
         }
         return tex;
     }
-    
-    private static Texture2D RotateTexture(Texture2D originalTexture, bool clockwise)
+
+    public static Texture2D RotateTexture(Texture2D originalTexture, bool clockwise)
     {
         Color32[] original = originalTexture.GetPixels32();
         Color32[] rotated = new Color32[original.Length];
