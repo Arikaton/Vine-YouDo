@@ -94,19 +94,12 @@ public class GetVineManager : MonoBehaviour
 
     IEnumerator DownloadImagesThenShow(List<VineData> vineList)
     {
-        var vineCardWithoutImage = new List<VineData>(vineList.Count / 2);
+        var vineCardWithoutImage = new List<VineData>();
         foreach (var vineData in vineList)
         {
-            if (!PlayerPrefs.HasKey(vineData.Image["url"]))
+            if (!File.Exists(ImageDownloader.GetPathFromImageUrl(vineData.Image["url"])))
             {
                 vineCardWithoutImage.Add(vineData);
-            }
-            else
-            {
-                if (!File.Exists(PlayerPrefs.GetString(vineData.Image["url"])))
-                {
-                    vineCardWithoutImage.Add(vineData);
-                }
             }
         }
         infoText.text = $"Загружаем изображения 0/{vineCardWithoutImage.Count}";

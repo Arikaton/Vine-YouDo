@@ -9,6 +9,7 @@ namespace _Scripts
 {
     public class GetFromListHelper : MonoBehaviour
     {
+        public enum GetDataPlace { GetVines, AddVines, DataList}
         public static GetFromListHelper Current;
 
         [SerializeField] private Back4appHelper _back4AppHelper;
@@ -16,6 +17,7 @@ namespace _Scripts
         [SerializeField] private GameObject buttonPrefab;
         [SerializeField] private GameObject loadingAnimation;
         [SerializeField] private GameObject errorMessage;
+        [SerializeField] private GetDataPlace place;
         public string type;
         
         private void OnEnable()
@@ -78,7 +80,22 @@ namespace _Scripts
 
             if (needUpdate)
             {
-                _back4AppHelper.GetData(type, OnGetData);
+                string query = "?limit=1000";
+                if (type == Back4appHelper.REGIONS_CLASS)
+                {
+                    if (place == GetDataPlace.AddVines && !string.IsNullOrEmpty(AddVineManager.Main.country))
+                        query += $"&where={{\"Country\": \"{AddVineManager.Main.country}\"}}";
+                    else if (place == GetDataPlace.GetVines && GetVineManager.main.countries.Count != 0)
+                    {
+                        var countryList = GetVineManager.main.countries.Keys.ToList();
+                        query += "&where={\"Country\":{\"$in\":[";
+                        countryList.ForEach(x => query += $"\"{x}\",");
+                        query = query.Remove(query.Length - 1);
+                        query += "]}}";
+                    }
+                    RepositoryManager.RegionNeedUpdate = true;
+                }
+                _back4AppHelper.GetData(type + query, OnGetData);
                 Debug.Log("Data getting from b4a");
             }
             else

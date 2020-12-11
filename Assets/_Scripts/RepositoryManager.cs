@@ -15,6 +15,7 @@ public class RepositoryManager : MonoBehaviour
     public static bool MoscowVineNeedUpdate = true;
     public static bool GreenVineNeedUpdate = true;
     public static bool NizniyVineNeedUpdate = true;
+    public static bool OtherVineNeedUpdate = true;
     
     public static string GrapeData;
     public static string ColorData;
@@ -23,6 +24,7 @@ public class RepositoryManager : MonoBehaviour
     public static string MoscowVineData;
     public static string GreenVineData;
     public static string NizniyVineData;
+    public static string OtherVineData;
 
     public static bool GetVineInfo(string cellar)
     {
@@ -35,7 +37,7 @@ public class RepositoryManager : MonoBehaviour
             case "Нижний":
                 return NizniyVineNeedUpdate;
             default:
-                throw new Exception("Wrong cellar");
+                return OtherVineNeedUpdate;
         }
     }
     
@@ -53,7 +55,8 @@ public class RepositoryManager : MonoBehaviour
                 NizniyVineNeedUpdate = needUpdate;
                 break;
             default:
-                throw new Exception("Wrong cellar");
+                OtherVineNeedUpdate = needUpdate;
+                break;
         }
     }
     public static void UpdateVineData(string cellar, string data)
@@ -70,7 +73,8 @@ public class RepositoryManager : MonoBehaviour
                 NizniyVineData = data;
                 break;
             default:
-                throw new Exception("Wrong cellar");
+                OtherVineData = data;
+                break;
         }
     }
     
@@ -85,7 +89,7 @@ public class RepositoryManager : MonoBehaviour
             case "Нижний":
                 return JsonConvert.DeserializeObject<List<VineData>>(NizniyVineData);
             default:
-                throw new Exception("Wrong cellar");
+                return JsonConvert.DeserializeObject<List<VineData>>(OtherVineData);
         }
     }
 }

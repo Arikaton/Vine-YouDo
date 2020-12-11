@@ -105,8 +105,7 @@ public class AddVineManager : MonoBehaviour
     {
         if (!String.IsNullOrEmpty(grape) && 
             !String.IsNullOrEmpty(color) && 
-            !String.IsNullOrEmpty(country) && 
-            !String.IsNullOrEmpty(name))
+            !String.IsNullOrEmpty(country))
         {
             RepositoryManager.UpdateVineInfo(cellar, true);
             
@@ -118,8 +117,7 @@ public class AddVineManager : MonoBehaviour
                 description,
                 count,
                 year,
-                cellar, 
-                name);
+                cellar);
 
             _back4AppHelper.UploadImage(_imagePath, vineData);
             UIManager.Main.ShowWindow(rootWindow);

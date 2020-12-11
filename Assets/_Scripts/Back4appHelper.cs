@@ -202,7 +202,7 @@ public class Back4appHelper : MonoBehaviour
                 {"url", imageData.url}
             };
             var texture = ImageDownloader.LoadTexture2D(path);
-            ImageDownloader.SaveImageLocal(texture, imageData.url, false);
+            ImageDownloader.SaveImageLocal(texture, imageData.url);
             StartCoroutine(AddDataCor(Back4appHelper.VINE_CLASS, JsonConvert.SerializeObject(data)));
         }
         else
@@ -220,7 +220,7 @@ public class Back4appHelper : MonoBehaviour
     IEnumerator GetVineCor(string cellar, OnGetVineList onGetVineList)
     {
         var filter = $"where={{\"Cellar\":\"{cellar}\"}}";
-        var www = new UnityWebRequest("https://parseapi.back4app.com/classes/Vine?"+filter);
+        var www = new UnityWebRequest("https://parseapi.back4app.com/classes/Vine?"+filter + "&limit=3000");
         SetHeaders(www);
         www.downloadHandler = new DownloadHandlerBuffer();
         yield return www.SendWebRequest();
@@ -333,13 +333,12 @@ public class VineData
     public string Region;
     public string Country;
     public string Description;
-    public string Name;
     public string Cellar;
     public int Count;
     public int Year { get; set; } = 0;
     public Dictionary<string, string> Image;
 
-    public VineData(string color, string grape, string region, string country, string description, int count, int year, string cellar, string name)
+    public VineData(string color, string grape, string region, string country, string description, int count, int year, string cellar)
     {
         Color = color;
         Grape = grape;
@@ -349,7 +348,6 @@ public class VineData
         Count = count;
         Year = year;
         Cellar = cellar;
-        Name = name;
     }
 
     public VineData Copy()
@@ -362,15 +360,14 @@ public class VineData
             Description,
             Count,
             Year,
-            Cellar,
-            Name);
+            Cellar);
         copy.Image = Image;
         return copy;
     }
 
     public override string ToString()
     {
-        return $"Название: {Name}\nВиноград: {Grape}\nЦвет: {Color}\nРегион: {Region}\nСтрана: {Country}\nОписание: {Description}\nПогреб: {Cellar}\nКол-во: {Count}\nГод: {Year}";
+        return $"Виноград: {Grape}\nЦвет: {Color}\nРегион: {Region}\nСтрана: {Country}\nОписание: {Description}\nПогреб: {Cellar}\nКол-во: {Count}\nГод: {Year}";
     }
 }
 

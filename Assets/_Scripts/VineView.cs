@@ -13,7 +13,7 @@ public class VineView : MonoBehaviour
     [SerializeField] private GameObject whichOneWindow;
     [SerializeField] private Back4appHelper _back4AppHelper;
     [SerializeField] private RawImage image;
-    [SerializeField] private Text nameText;
+    //[SerializeField] private Text nameText;
     [SerializeField] private Text descriptionText;
     [SerializeField] private Text countText;
     [SerializeField] private Text yearText;
@@ -52,7 +52,6 @@ public class VineView : MonoBehaviour
     private void ShowData()
     {
         image.texture = _texture2D;
-        nameText.text = _vineData.Name;
         descriptionText.text = _vineData.Description;
         countText.text = "Количество: " + _vineData.Count;
         yearText.text = _vineData.Year == 0 ? "Non Vintage" : _vineData.Year.ToString();
@@ -140,7 +139,8 @@ public class VineView : MonoBehaviour
                 RepositoryManager.NizniyVineNeedUpdate = true;
                 break;
             default:
-                throw new Exception("Wrong cellar");
+                RepositoryManager.OtherVineNeedUpdate = true;
+                break;
         }
     }
 
@@ -150,10 +150,9 @@ public class VineView : MonoBehaviour
         if (_vineData.Count == _count)
         {
             _back4AppHelper.DeleteObject(_vineData.objectId, Back4appHelper.VINE_CLASS);
-            var path = PlayerPrefs.GetString(_vineData.Image["url"]);
+            var path = ImageDownloader.GetPathFromImageUrl(_vineData.Image["url"]);
             Destroy(_cardObj);
             File.Delete(path);
-            PlayerPrefs.DeleteKey(_vineData.Image["url"]);
         }
         else
         {

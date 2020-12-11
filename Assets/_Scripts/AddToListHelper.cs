@@ -82,6 +82,8 @@ public class AddToListHelper : MonoBehaviour
         downloadImage.SetActive(false);
         successText.SetActive(true);
         inputField.text = "";
+        if (type == Back4appHelper.REGIONS_CLASS)
+            regionCountryText.text = "";
     }
 
     public void ErrorWhileAdding()

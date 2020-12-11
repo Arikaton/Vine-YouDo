@@ -45,6 +45,7 @@ public class ChangeAllFonts : EditorWindow
                     if (prefabText != null)
                     {
                         prefabText.font = _newFont;
+                        PrefabUtility.SavePrefabAsset(prefab);
                     }
                 }
 

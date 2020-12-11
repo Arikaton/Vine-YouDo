@@ -24,7 +24,7 @@ public class VineCard : MonoBehaviour, IPointerClickHandler
     public void Init(VineData vineData)
     {
         VineData = vineData;
-        imagePath = PlayerPrefs.GetString(VineData.Image["url"]);
+        imagePath = ImageDownloader.GetPathFromImageUrl(vineData.Image["url"]);
         StartCoroutine(DelayedInit());
     }
 

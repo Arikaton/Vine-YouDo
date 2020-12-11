@@ -22,7 +22,7 @@ public class ImageDownloader : MonoBehaviour
         var uploadImageCount = 0;
         foreach (var vineData in vineList)
         {
-            if (!PlayerPrefs.HasKey(vineData.Image["url"]) && !File.Exists(vineData.Image["url"]))
+            if (!File.Exists(GetPathFromImageUrl(vineData.Image["url"])))
             {
                 var www = UnityWebRequestTexture.GetTexture(vineData.Image["url"]);
                 yield return www.SendWebRequest();
@@ -35,18 +35,18 @@ public class ImageDownloader : MonoBehaviour
         }
     }
 
-    public static void SaveImageLocal(Texture2D texture2D, string prefKey, bool rotate = true)
+    public static void SaveImageLocal(Texture2D texture2D, string prefKey)
     {
-#if !UNITY_IOS
-        if (rotate)
-            texture2D = RotateTexture(texture2D, true);
-#endif
-        var guid = Guid.NewGuid().ToString();
-        var path = Application.persistentDataPath + $"/{guid}.jpeg";
+        var path = GetPathFromImageUrl(prefKey);
         TextureScale.Scale(texture2D, 512, 512);
         File.WriteAllBytes(path, texture2D.EncodeToJPG());
         PlayerPrefs.SetString(prefKey, path);
         Resources.UnloadUnusedAssets();
+    }
+
+    public static string GetPathFromImageUrl(string url)
+    {
+        return Application.persistentDataPath +  $"/{url.Replace("https://parsefiles.back4app.com/", "").Split('/')[1]}";
     }
     
     public static Texture2D LoadTexture2D(string filePath) {
@@ -59,10 +59,14 @@ public class ImageDownloader : MonoBehaviour
             tex = new Texture2D(2, 2);
             tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
         }
+        else
+        {
+            throw new Exception("File not exists\nFolder: " + filePath);
+        }
         return tex;
     }
     
-    public static Texture2D RotateTexture(Texture2D originalTexture, bool clockwise)
+    private static Texture2D RotateTexture(Texture2D originalTexture, bool clockwise)
     {
         Color32[] original = originalTexture.GetPixels32();
         Color32[] rotated = new Color32[original.Length];
